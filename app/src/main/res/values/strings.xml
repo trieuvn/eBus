@@ -1,3 +1,60 @@
 <resources>
-    <string name="app_name">Project_Bus</string>
+    <string name="app_name">Bus App</string>
+
+    <string name="hello_user">Hello Saduni Silva!</string>
+    <string name="btn_find_buses">Find Buses</string>
+
+    <string name="subtitle_where_go">Where you want go</string>
+    <string name="hint_boarding">Boarding From</string>
+    <string name="hint_destination">Where are you going?</string>
+    <string name="btn_today">Today</string>
+    <string name="btn_tomorrow">Tomorrow</string>
+    <string name="btn_other">Other</string>
+    <string name="title_upcoming">Upcoming Journey</string>
+    <string name="num_1">1</string>
+    <string name="num_2">2</string>
+    <string name="bus_term_1">Bus terminal 1</string>
+    <string name="bus_term_2">Bus terminal 2</string>
+    <string name="from_kelaniya">From : Kelaniya</string>
+    <string name="from_biyagama">From : Biyagama</string>
+    <string name="to_colombo">to : Colombo</string>
+    <string name="to_kelaniya">to : Kelaniya</string>
+    <string name="lbl_departure">departure time</string>
+    <string name="time_9am">9 AM</string>
+    <string name="time_2pm">2 PM</string>
+    <string name="date_sample">Sun 2024.12.08</string>
+
+    <string name="subtitle_select_bus">Select your bus!</string>
+    <string name="loc_kelaniya">Kelaniya</string>
+    <string name="loc_colombo">Colombo</string>
+    <string name="date_booking_header">08th - Dec - 2024 | Sunday</string>
+
+    <string name="bus_name_perera">Perera Travels</string>
+    <string name="price_200">LKR 200</string>
+    <string name="type_ac_sleeper">A/C Sleeper (2+2)</string>
+    <string name="duration_45">45 Min</string>
+    <string name="time_range_1">9:00 AM — 9:45 AM</string>
+    <string name="seats_15">15 Seats left</string>
+
+    <string name="bus_name_gayan">Gayan Express</string>
+    <string name="price_250">LKR 250</string>
+    <string name="duration_20">20 Min</string>
+    <string name="time_range_2">9:00 AM — 9:20 AM</string>
+    <string name="seats_2">2 Seats left</string>
+
+    <string name="bus_name_shehan">Shehan Travels</string>
+    <string name="price_100">LKR 100</string>
+    <string name="type_non_ac">Non A/C Sleeper (2+1)</string>
+    <string name="seats_5">5 Seats left</string>
+
+    <string name="desc_user_avatar">User Avatar</string>
+    <string name="desc_filter">Filter</string>
+    <string name="desc_notification">Notifications</string>
+    <string name="desc_bus_route">Bus Route Image</string>
+    <string name="desc_swap">Swap Locations</string>
+    <string name="desc_settings">Settings</string>
+    <string name="desc_ticket">Ticket</string>
+    <string name="desc_home">Home</string>
+    <string name="desc_wallet">Wallet</string>
+    <string name="desc_calendar">Calendar</string>
 </resources>
