@@ -57,4 +57,22 @@
     <string name="desc_home">Home</string>
     <string name="desc_wallet">Wallet</string>
     <string name="desc_calendar">Calendar</string>
+    <string name="subtitle_choose_seat">Choose your seat!</string>
+    <string name="label_lower_deck">LOWER DECK</string>
+    <string name="label_upper_deck">UPPER DECK</string>
+    <string name="status_booked">Booked</string>
+    <string name="status_your_seat">Your Seat</string>
+    <string name="status_available">Available</string>
+    <string name="btn_lower">LOWER</string>
+    <string name="btn_upper">UPPER</string>
+    <string name="seat_a">A</string>
+    <string name="seat_b">B</string>
+    <string name="seat_c">C</string>
+    <string name="seat_d">D</string>
+
+    <string name="desc_back">Back Button</string>
+    <string name="desc_steering_wheel">Steering Wheel</string>
+    <string name="desc_seat_booked">Booked Seat</string>
+    <string name="desc_seat_available">Available Seat</string>
+    <string name="desc_seat_selected">Selected Seat</string>
 </resources>

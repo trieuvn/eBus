@@ -18,4 +18,8 @@
     <color name="nav_icon_unselected">#FF8A80</color>
     <color name="text_green">#4CAF50</color>
     <color name="text_price">#FF9800</color>
+    <color name="seat_booked">#EF9A9A</color>
+    <color name="seat_selected">#FFB300</color>
+    <color name="seat_available">#EEEEEE</color>
+    <color name="stroke_gray">#BDBDBD</color>
 </resources>
