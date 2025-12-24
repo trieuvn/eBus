@@ -43,6 +43,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
@@ -83,6 +84,7 @@
             android:layout_marginBottom="16dp">
 
             <EditText
+            android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/bg_input_field"
@@ -114,7 +116,7 @@
             android:textSize="14sp" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnSignIn"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginBottom="30dp"
@@ -177,7 +179,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvCreateAccount"
+            android:id="@+id/txtGoRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create an account"

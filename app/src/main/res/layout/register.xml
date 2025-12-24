@@ -43,6 +43,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/edtFullName"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"
@@ -64,6 +65,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"
@@ -74,6 +76,28 @@
             android:paddingEnd="20dp"
             android:textColor="@color/text_dark"
             android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Phone Number"
+            android:textColor="#0D1B2A"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtPhone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Enter your phone"
+            android:inputType="phone"
+            android:padding="12dp"
+            android:textColor="@color/text_dark"
+            android:textSize="14sp" />
+
 
         <TextView
             android:layout_width="match_parent"
@@ -90,6 +114,7 @@
             android:layout_marginBottom="16dp">
 
             <EditText
+            android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/bg_input_field"
@@ -134,7 +159,7 @@
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnRegister"
+            android:id="@+id/btnSignUp"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginBottom="24dp"
@@ -209,7 +234,7 @@
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/tvSignIn"
+                android:id="@+id/txtGoLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sign in here"
