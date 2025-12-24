@@ -40,6 +40,20 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".SignupSuccessActivity" />
+
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".BookingActivity" />
+        <activity android:name=".SeatSelectionActivity" />
+        <activity android:name=".BoardingDropActivity" />
+        <activity android:name=".GuestDetailsActivity" />
+
+        <activity android:name=".PaymentActivity" />
+        <activity android:name=".PaymentSuccessActivity" />
+
+        <activity android:name=".SupabaseCrudTestActivity" />
 
     </application>
 
