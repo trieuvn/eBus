@@ -5,7 +5,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project_bus.R
-import com.example.project_bus.RegisterActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,12 +15,6 @@ class MainActivity : AppCompatActivity() {
         val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
         val tvCreateAccount = findViewById<TextView>(R.id.tvCreateAccount)
 
-        btnGetStarted.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
 
-        tvCreateAccount.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
     }
 }

@@ -13,11 +13,11 @@ class SignupSuccessActivity : AppCompatActivity() {
         // ID lấy từ signup_success.xml
         val tvSignIn = findViewById<TextView>(R.id.tvSignIn)
 
-        tvSignIn.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            // Xóa stack để người dùng không back lại màn hình success
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-        }
+//        tvSignIn.setOnClickListener {
+//            val intent = Intent(this, LoginActivity::class.java)
+//            // Xóa stack để người dùng không back lại màn hình success
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            startActivity(intent)
+//        }
     }
 }
