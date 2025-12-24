@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_pink">
@@ -35,60 +36,65 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:src="@drawable/user_avatar"
                             android:contentDescription="@string/desc_user_avatar"
-                            android:scaleType="centerCrop"/>
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/user_avatar" />
                     </androidx.cardview.widget.CardView>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="12dp"
+                        android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="@string/hello_user"
-                            android:textStyle="bold"
                             android:textColor="#333"
                             android:textSize="14sp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textStyle="bold" />
+
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="@string/subtitle_choose_seat"
                             android:textColor="#E57373"
-                            android:textSize="12sp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <FrameLayout
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:layout_marginEnd="10dp">
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/bg_input_field">
+
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_back"
                             android:layout_gravity="center"
                             android:contentDescription="@string/desc_back"
-                            app:tint="#333"/>
+                            android:src="@drawable/ic_back"
+                            app:tint="#333" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field">
+
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_notification"
                             android:layout_gravity="center"
                             android:contentDescription="@string/desc_notification"
-                            app:tint="#333"/>
+                            android:src="@drawable/ic_notification"
+                            app:tint="#333" />
                     </FrameLayout>
                 </LinearLayout>
 
@@ -113,35 +119,36 @@
                             android:orientation="horizontal">
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:text="@string/loc_kelaniya"
                                 android:textColor="#FFF"
-                                android:textStyle="bold"
                                 android:textSize="16sp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textStyle="bold" />
 
                             <FrameLayout
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
+                                android:layout_marginHorizontal="16dp"
                                 android:background="@drawable/ic_swap"
-                                android:backgroundTint="#111"
-                                android:layout_marginHorizontal="16dp">
+                                android:backgroundTint="#111">
+
                                 <ImageView
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
-                                    android:src="@drawable/ic_swap"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/desc_swap"
-                                    app:tint="#FFF"/>
+                                    android:src="@drawable/ic_swap"
+                                    app:tint="#FFF" />
                             </FrameLayout>
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:text="@string/loc_colombo"
                                 android:textColor="#FFF"
-                                android:textStyle="bold"
                                 android:textSize="16sp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textStyle="bold" />
                         </LinearLayout>
 
                         <TextView
@@ -153,18 +160,18 @@
                             android:paddingVertical="6dp"
                             android:text="@string/date_booking_header"
                             android:textColor="#FFF"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/redHeader"
-                        android:layout_marginTop="-20dp"
                         android:layout_marginHorizontal="10dp"
+                        android:layout_marginTop="-20dp"
+                        app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardElevation="4dp">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -173,61 +180,81 @@
 
                             <TextView
                                 android:id="@+id/tvBusName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:text="@string/bus_name_perera"
-                                android:textStyle="bold"
                                 android:textColor="#333"
                                 android:textSize="14sp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textStyle="bold" />
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
                                 android:text="@string/price_200"
-                                android:textStyle="bold"
                                 android:textColor="@color/text_price"
                                 android:textSize="16sp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/tvType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/tvBusName"
+                                android:layout_marginTop="2dp"
                                 android:text="@string/type_ac_sleeper"
                                 android:textColor="#757575"
-                                android:textSize="11sp"
-                                android:layout_marginTop="2dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textSize="11sp" />
 
                             <TextView
                                 android:id="@+id/tvTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/tvType"
+                                android:layout_marginTop="2dp"
                                 android:text="@string/time_range_1"
                                 android:textColor="#333"
-                                android:textSize="11sp"
-                                android:layout_marginTop="2dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textSize="11sp" />
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/tvTime"
+                                android:layout_marginTop="4dp"
                                 android:text="@string/seats_15"
                                 android:textColor="@color/text_green"
-                                android:textSize="11sp"
-                                android:layout_marginTop="4dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:textSize="11sp" />
 
                             <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/tvTime"
                                 android:layout_alignParentEnd="true"
-                                android:orientation="horizontal"
                                 android:layout_marginTop="4dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-                                <ImageView android:src="@drawable/ic_settings" android:layout_width="12dp" android:layout_height="12dp" app:tint="#999" android:layout_marginEnd="4dp" tools:ignore="ContentDescription"/>
-                                <ImageView android:src="@drawable/ic_ticket" android:layout_width="12dp" android:layout_height="12dp" app:tint="#999" tools:ignore="ContentDescription"/>
-                                <ImageView android:src="@drawable/ic_swap" android:layout_width="12dp" android:layout_height="12dp" app:tint="#999" android:layout_marginStart="4dp" tools:ignore="ContentDescription"/>
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:src="@drawable/ic_settings"
+                                    app:tint="#999"
+                                    tools:ignore="ContentDescription" />
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:src="@drawable/ic_ticket"
+                                    app:tint="#999"
+                                    tools:ignore="ContentDescription" />
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:layout_marginStart="4dp"
+                                    android:src="@drawable/ic_swap"
+                                    app:tint="#999"
+                                    tools:ignore="ContentDescription" />
                             </LinearLayout>
                         </RelativeLayout>
                     </androidx.cardview.widget.CardView>
@@ -238,145 +265,154 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#F5F5F5"
+                android:backgroundTint="#F0F0F0"
                 android:orientation="vertical"
-                android:padding="20dp"
-                android:backgroundTint="#F0F0F0"> <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#00FFFFFF"> <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:padding="20dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/bg_white_rounded_12dp"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_loc_start"
-                        android:contentDescription="@string/desc_loc_icon"
-                        app:tint="#333"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginHorizontal="12dp"
-                        android:text="@string/hint_select_boarding"
-                        android:textColor="#555"
-                        android:textSize="14sp"/>
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_arrow_down"
-                        android:contentDescription="@string/desc_arrow_down"
-                        app:tint="#333"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/bg_white_rounded_12dp"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_loc_end"
-                        android:contentDescription="@string/desc_loc_icon"
-                        app:tint="#333"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginHorizontal="12dp"
-                        android:text="@string/hint_select_drop"
-                        android:textColor="#555"
-                        android:textSize="14sp"/>
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_arrow_down"
-                        android:contentDescription="@string/desc_arrow_down"
-                        app:tint="#333"/>
-                </LinearLayout>
-
-                <LinearLayout
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:orientation="horizontal">
+                    app:cardBackgroundColor="#00FFFFFF"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:orientation="vertical">
-                        <TextView
-                            android:text="@string/label_selected_seats"
-                            android:textSize="12sp"
-                            android:textColor="#757575"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView
-                            android:text="@string/val_seats_sample"
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="55dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/bg_white_rounded_12dp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@string/desc_loc_icon"
+                                android:src="@drawable/ic_loc_start"
+                                app:tint="#333" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="12dp"
+                                android:layout_weight="1"
+                                android:text="@string/hint_select_boarding"
+                                android:textColor="#555"
+                                android:textSize="14sp" />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:contentDescription="@string/desc_arrow_down"
+                                android:src="@drawable/ic_arrow_down"
+                                app:tint="#333" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="55dp"
+                            android:layout_marginBottom="24dp"
+                            android:background="@drawable/bg_white_rounded_12dp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@string/desc_loc_icon"
+                                android:src="@drawable/ic_loc_end"
+                                app:tint="#333" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="12dp"
+                                android:layout_weight="1"
+                                android:text="@string/hint_select_drop"
+                                android:textColor="#555"
+                                android:textSize="14sp" />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:contentDescription="@string/desc_arrow_down"
+                                android:src="@drawable/ic_arrow_down"
+                                app:tint="#333" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="20dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_selected_seats"
+                                    android:textColor="#757575"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/val_seats_sample"
+                                    android:textColor="#333"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_total_fare"
+                                    android:textColor="#757575"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/val_fare_total"
+                                    android:textColor="#333"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnNext"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_red_button"
+                            android:text="@string/btn_proceed"
+                            android:textAllCaps="false"
+                            android:textColor="#FFF"
                             android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#333"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textStyle="bold" />
+
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:orientation="vertical">
-                        <TextView
-                            android:text="@string/label_total_fare"
-                            android:textSize="12sp"
-                            android:textColor="#757575"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView
-                            android:text="@string/val_fare_total"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#333"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_red_button"
-                    android:text="@string/btn_proceed"
-                    android:textAllCaps="false"
-                    android:textColor="#FFF"
-                    android:textStyle="bold"
-                    android:textSize="16sp"/>
-
-            </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"/>
+                    android:layout_height="40dp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -395,38 +431,39 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginHorizontal="25dp"
-            android:src="@drawable/ic_home"
             android:contentDescription="@string/desc_home"
-            app:tint="#FF8A80"/>
+            android:src="@drawable/ic_home"
+            app:tint="#FF8A80" />
 
         <FrameLayout
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/bg_input_field">
+
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_ticket"
                 android:contentDescription="@string/desc_ticket"
-                app:tint="@color/brand_red"/>
+                android:src="@drawable/ic_ticket"
+                app:tint="@color/brand_red" />
         </FrameLayout>
 
         <ImageView
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginHorizontal="25dp"
-            android:src="@drawable/ic_wallet"
             android:contentDescription="@string/desc_wallet"
-            app:tint="#FF8A80"/>
+            android:src="@drawable/ic_wallet"
+            app:tint="#FF8A80" />
 
         <ImageView
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginHorizontal="20dp"
-            android:src="@drawable/ic_settings"
             android:contentDescription="@string/desc_settings"
-            app:tint="#FF8A80"/>
+            android:src="@drawable/ic_settings"
+            app:tint="#FF8A80" />
 
     </LinearLayout>
 
