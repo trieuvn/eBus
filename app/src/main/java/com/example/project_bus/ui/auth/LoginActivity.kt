@@ -9,7 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.project_bus.MainActivity
+import com.example.project_bus.HomeActivity // <--- Quan trọng: Import HomeActivity
 import com.example.project_bus.R
 import com.example.project_bus.data.services.AuthService
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.login)
+        setContentView(R.layout.login) // Đảm bảo tên layout đúng là activity_login hoặc login
 
         val edtEmail = findViewById<EditText>(R.id.edtEmail)
         val edtPassword = findViewById<EditText>(R.id.edtPassword)
@@ -38,48 +38,52 @@ class LoginActivity : AppCompatActivity() {
                 !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Email không hợp lệ")
                 password.isBlank() -> toast("Vui lòng nhập mật khẩu")
                 else -> {
+                    // Disable nút để tránh bấm nhiều lần
                     btnSignIn.isEnabled = false
 
                     lifecycleScope.launch {
                         try {
+                            // Gọi hàm đăng nhập
                             val profile = withContext(Dispatchers.IO) {
                                 authService.signIn(email, password)
                             }
 
-                            // profile có thể null nếu bạn chưa tạo trigger/policy cho bảng User
-                            toast("Đăng nhập OK ✅ ${profile?.fullName ?: ""}".trim())
+                            // --- KHU VỰC QUAN TRỌNG NHẤT ---
+                            toast("Đăng nhập thành công!")
 
-                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                            // Chuyển sang HomeActivity
+                            val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                            // Xóa hết các màn hình cũ (Login, Main) khỏi bộ nhớ để user không bấm Back quay lại được
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
                             finish()
+                            // -------------------------------
+
                         } catch (e: Exception) {
-                            toast("Đăng nhập thất bại: ${friendlyAuthMessage(e)}")
-                        } finally {
-                            btnSignIn.isEnabled = true
+                            toast("Lỗi: ${friendlyAuthMessage(e)}")
+                            btnSignIn.isEnabled = true // Mở lại nút nếu lỗi
                         }
                     }
                 }
             }
         }
 
+        // Chuyển sang trang đăng ký
         txtGoRegister.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 
     private fun toast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     private fun friendlyAuthMessage(e: Throwable): String {
-        val msg = (e.message ?: e.toString())
+        val msg = e.message ?: e.toString()
         return when {
-            msg.contains("email_not_confirmed", ignoreCase = true) ->
-                "Email chưa xác thực. Mở email để xác thực trước."
-            msg.contains("invalid_credentials", ignoreCase = true) ||
-                    msg.contains("Invalid login credentials", ignoreCase = true) ->
-                "Sai email hoặc mật khẩu."
-            msg.contains("user_banned", ignoreCase = true) ->
-                "Tài khoản đang bị khóa."
+            msg.contains("invalid_credentials", true) -> "Sai email hoặc mật khẩu"
+            msg.contains("email_not_confirmed", true) -> "Email chưa xác thực"
             else -> msg
         }
     }
