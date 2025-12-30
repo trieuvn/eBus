@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_pink"
@@ -42,6 +43,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
@@ -82,6 +84,7 @@
             android:layout_marginBottom="16dp">
 
             <EditText
+            android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/bg_input_field"
@@ -97,8 +100,8 @@
                 android:layout_height="24dp"
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_eye"
                 android:alpha="0.4"
+                android:src="@drawable/ic_eye"
                 tools:ignore="ContentDescription" />
         </FrameLayout>
 
@@ -113,6 +116,7 @@
             android:textSize="14sp" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSignIn"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginBottom="30dp"
@@ -126,8 +130,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <View
@@ -154,16 +158,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:layout_marginBottom="40dp"
             android:background="@drawable/bg_button_gray"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_marginBottom="40dp">
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/google"
-                android:layout_marginEnd="10dp"/>
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/google" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -171,10 +175,11 @@
                 android:text="Continue with Google"
                 android:textColor="#555555"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
 
         <TextView
+            android:id="@+id/txtGoRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create an account"
