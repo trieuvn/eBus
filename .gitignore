@@ -1,74 +1,15 @@
-# --- Android ---
-*.apk
-*.ap_
-*.aab
-*.dex
-*.class
-
-# Binaries và thư mục Build
-/build
-/app/build
-/bin
-/gen
-/out
-
-# Gradle files
-.gradle/
-build/
-!gradle-wrapper.jar
-!gradle-wrapper.properties
-
-# Android Studio / IntelliJ IDEA
-.idea/
 *.iml
-*.ipr
-*.iws
-/captures
-/navigation-captures
-
-# NDK / Native code (nếu có dùng C++)
-.cxx/
-.externalNativeBuild/
-
-# Local configuration file (QUAN TRỌNG: Chứa đường dẫn SDK và có thể chứa Key)
-local.properties
-
-# Signing configurations (Keystore files)
-# TUYỆT ĐỐI KHÔNG UP FILE NÀY LÊN REPO PUBLIC
-*.jks
-*.keystore
-*.pem
-*.p12
-*.key
-
-# --- Operating System ---
-# macOS
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 .DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# --- Testing ---
-/test-results
-
-# --- Other ---
-# --- iOS / Xcode (Dành cho KMP) ---
-*.mode1v3
-*.mode2v3
-*.mov
-*.pbxuser
-*.perspectivev3
-xcuserdata
-*.xccheckout
-*.xcdatamodeld
-DerivedData/
-build/
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
