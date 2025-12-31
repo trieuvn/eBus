@@ -31,11 +31,9 @@
                     android:layout_height="50dp"
                     app:cardCornerRadius="25dp"
                     app:cardElevation="0dp">
-
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:contentDescription="@string/desc_user_avatar"
                         android:scaleType="centerCrop"
                         android:src="@drawable/user_avatar" />
                 </androidx.cardview.widget.CardView>
@@ -46,48 +44,44 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
-
                     <TextView
+                        android:id="@+id/tvHeaderUser"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/hello_user"
+                        android:text="Hello User!"
                         android:textColor="#333"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subtitle_choose_seat"
+                        android:text="Fill your details"
                         android:textColor="#E57373"
                         android:textSize="12sp" />
                 </LinearLayout>
 
                 <FrameLayout
+                    android:id="@+id/btnBack"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_input_field">
-
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center"
-                        android:contentDescription="@string/desc_back"
-                        android:src="@drawable/ic_back"
+                        android:src="@drawable/ic_home"
+                        android:rotation="180"
                         app:tint="#333" />
                 </FrameLayout>
-
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_input_field">
-
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center"
-                        android:contentDescription="@string/desc_notification"
                         android:src="@drawable/ic_notification"
                         app:tint="#333" />
                 </FrameLayout>
@@ -106,26 +100,29 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvBusName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
-                        android:text="@string/bus_name_perera"
+                        android:text="Perera Travels"
                         android:textColor="#FFF"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvBusType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
-                        android:text="@string/type_ac_sleeper"
+                        android:text="A/C Sleeper (2+2)"
                         android:textColor="#EEE"
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/tvTripTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/time_range_1"
+                        android:text="09:00 AM - 09:45 AM"
                         android:textColor="#EEE"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -135,7 +132,6 @@
                     android:layout_height="60dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:contentDescription="@string/desc_bus_route"
                     android:src="@drawable/bus_booking" />
             </RelativeLayout>
 
@@ -158,120 +154,16 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginBottom="16dp"
-                        android:text="@string/label_traveller_info"
+                        android:text="Traveller Information"
                         android:textColor="#333"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/label_passenger_1"
-                        android:textColor="#555"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="45dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/bg_gray_input"
-                        android:hint="@string/hint_full_name"
-                        android:inputType="textPersonName"
-                        android:paddingHorizontal="16dp"
-                        android:textSize="14sp" />
-
                     <LinearLayout
+                        android:id="@+id/containerPassengers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:layout_width="80dp"
-                            android:layout_height="45dp"
-                            android:background="@drawable/bg_gray_input"
-                            android:gravity="center"
-                            android:hint="@string/hint_age"
-                            android:inputType="number"
-                            android:textSize="14sp" />
-
-                        <RadioGroup
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <RadioButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="16dp"
-                                android:text="@string/gender_male"
-                                android:textSize="14sp" />
-
-                            <RadioButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/gender_female"
-                                android:textSize="14sp" />
-                        </RadioGroup>
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/label_passenger_2"
-                        android:textColor="#555"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="45dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/bg_gray_input"
-                        android:hint="@string/hint_full_name"
-                        android:inputType="textPersonName"
-                        android:paddingHorizontal="16dp"
-                        android:textSize="14sp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:layout_width="80dp"
-                            android:layout_height="45dp"
-                            android:background="@drawable/bg_gray_input"
-                            android:gravity="center"
-                            android:hint="@string/hint_age"
-                            android:inputType="number"
-                            android:textSize="14sp" />
-
-                        <RadioGroup
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <RadioButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="16dp"
-                                android:text="@string/gender_male"
-                                android:textSize="14sp" />
-
-                            <RadioButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/gender_female"
-                                android:textSize="14sp" />
-                        </RadioGroup>
-                    </LinearLayout>
-
+                        android:orientation="vertical" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -294,26 +186,28 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginBottom="16dp"
-                        android:text="@string/label_contact_info"
+                        android:text="Contact Information"
                         android:textColor="#333"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <EditText
+                        android:id="@+id/etContactMobile"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
                         android:layout_marginBottom="10dp"
                         android:background="@drawable/bg_gray_input"
-                        android:hint="@string/hint_mobile"
+                        android:hint="Mobile Number"
                         android:inputType="phone"
                         android:paddingHorizontal="16dp"
                         android:textSize="14sp" />
 
                     <EditText
+                        android:id="@+id/etContactEmail"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
                         android:background="@drawable/bg_gray_input"
-                        android:hint="@string/hint_email"
+                        android:hint="Email Address"
                         android:inputType="textEmailAddress"
                         android:paddingHorizontal="16dp"
                         android:textSize="14sp" />
@@ -321,12 +215,12 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnProceedPayment"
+                android:id="@+id/btnProceedBook"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/bg_red_button"
-                android:text="@string/btn_proceed_book"
+                android:text="Proceed to Book"
                 android:textAllCaps="false"
                 android:textColor="#FFF"
                 android:textSize="16sp"
@@ -343,44 +237,12 @@
         android:background="@drawable/bg_bottom_nav"
         android:gravity="center"
         android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginHorizontal="25dp"
-            android:contentDescription="@string/desc_home"
-            android:src="@drawable/ic_home"
-            app:tint="#FF8A80" />
-
-        <FrameLayout
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field">
-
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/desc_ticket"
-                android:src="@drawable/ic_ticket"
-                app:tint="@color/brand_red" />
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_marginHorizontal="25dp" android:src="@drawable/ic_home" app:tint="#FF8A80" />
+        <FrameLayout android:layout_width="50dp" android:layout_height="50dp" android:background="@drawable/bg_input_field">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:src="@drawable/ic_ticket" app:tint="@color/brand_red" />
         </FrameLayout>
-
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginHorizontal="25dp"
-            android:contentDescription="@string/desc_wallet"
-            android:src="@drawable/ic_wallet"
-            app:tint="#FF8A80" />
-
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginHorizontal="20dp"
-            android:contentDescription="@string/desc_settings"
-            android:src="@drawable/ic_settings"
-            app:tint="#FF8A80" />
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_marginHorizontal="25dp" android:src="@drawable/ic_wallet" app:tint="#FF8A80" />
+        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_marginHorizontal="20dp" android:src="@drawable/ic_settings" app:tint="#FF8A80" />
     </LinearLayout>
 
 </RelativeLayout>

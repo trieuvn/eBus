@@ -51,7 +51,7 @@
                         android:id="@+id/tvUserName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/hello_user"
+                        android:text="Hello User!"
                         android:textColor="#333"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -137,26 +137,29 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/btnToday"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:background="@drawable/bg_date_button"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="8dp"
-                        android:text="@string/btn_today"
+                        android:text="Today"
                         android:textColor="#FFF" />
 
                     <TextView
+                        android:id="@+id/btnTomorrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:background="@drawable/bg_date_button"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="8dp"
-                        android:text="@string/btn_tomorrow"
+                        android:text="Tomorrow"
                         android:textColor="#FFF" />
 
                     <LinearLayout
+                        android:id="@+id/btnOtherDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_date_button"
@@ -171,10 +174,11 @@
                             tools:ignore="ContentDescription" />
 
                         <TextView
+                            android:id="@+id/tvOtherDateText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
-                            android:text="@string/btn_other"
+                            android:text="Other"
                             android:textColor="#FFF" />
                     </LinearLayout>
                 </LinearLayout>
@@ -201,184 +205,12 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardUpcoming1"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBookings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="50dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/card_orange"
-                        android:gravity="center"
-                        android:text="@string/num_1"
-                        android:textColor="#FFF"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:text="@string/bus_term_1"
-                            android:textColor="#333"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvUp1From"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/from_kelaniya"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvUp1To"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/to_colombo"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/card_black"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lbl_departure"
-                            android:textColor="#AAA"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvUp1Time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/time_9am"
-                            android:textColor="#FFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvUp1Date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/date_sample"
-                            android:textColor="#FFF"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardUpcoming2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:visibility="gone"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="50dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/card_orange"
-                        android:gravity="center"
-                        android:text="@string/num_2"
-                        android:textColor="#FFF"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:text="@string/bus_term_2"
-                            android:textColor="#333"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvUp2From"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/from_biyagama"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvUp2To"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/to_kelaniya"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/card_black"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lbl_departure"
-                            android:textColor="#AAA"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvUp2Time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/time_2pm"
-                            android:textColor="#FFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvUp2Date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/date_sample"
-                            android:textColor="#FFF"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
+                android:layout_marginBottom="80dp"
+                android:nestedScrollingEnabled="false" />
             <TextView
                 android:id="@+id/tvNoUpcoming"
                 android:layout_width="match_parent"
