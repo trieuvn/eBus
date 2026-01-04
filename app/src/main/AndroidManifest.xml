@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Supabase/HTTP calls cần INTERNET permission -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -18,12 +17,7 @@
 
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
         <activity
             android:name=".ui.auth.RegisterActivity"
@@ -33,27 +27,48 @@
             android:name=".ui.auth.SignupSuccessActivity"
             android:exported="false" />
 
+        <!-- Callback deeplink cho OAuth (Google) + email/OTP link verification. -->
+        <activity
+            android:name=".ui.auth.AuthCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Phải khớp với SupabaseProvider: scheme = applicationId, host = login-callback -->
+                <data
+                    android:scheme="${applicationId}"
+                    android:host="login-callback" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".SupabaseCrudTestActivity"
             android:exported="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="false" />
 
-        <activity android:name=".SignupSuccessActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-        <activity android:name=".HomeActivity" />
         <activity android:name=".BookingActivity" />
         <activity android:name=".SeatSelectionActivity" />
         <activity android:name=".BoardingDropActivity" />
         <activity android:name=".GuestDetailsActivity" />
-
         <activity android:name=".PaymentActivity" />
         <activity android:name=".PaymentSuccessActivity" />
-
-
 
     </application>
 
 </manifest>
+

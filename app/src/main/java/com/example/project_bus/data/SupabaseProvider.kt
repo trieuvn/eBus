@@ -3,10 +3,19 @@ package com.example.project_bus.data
 import com.example.project_bus.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.ExternalAuthAction
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 
 object SupabaseProvider {
+
+    /**
+     * Deeplink dùng cho OAuth (Google) + OTP/email link verification.
+     * Nhớ cấu hình giống hệt trong AndroidManifest + Supabase Dashboard (Redirect URLs).
+     */
+    private const val DEEPLINK_HOST = "login-callback"
+    private val DEEPLINK_SCHEME = BuildConfig.APPLICATION_ID
 
     /**
      * Ưu tiên lấy từ BuildConfig (đọc từ local.properties trong app/build.gradle.kts).
@@ -28,10 +37,22 @@ object SupabaseProvider {
             supabaseKey = supabaseAnonKey
         ) {
             // Auth dùng cho đăng ký/đăng nhập + tự gắn JWT vào các request PostgREST
-            install(Auth)
+            install(Auth) {
+                // PKCE là flow khuyến nghị cho mobile
+                flowType = FlowType.PKCE
+
+                // OAuth/OTP link verification trên Android dùng deeplink
+                scheme = DEEPLINK_SCHEME
+                host = DEEPLINK_HOST
+
+                // Mở đăng nhập OAuth trong Custom Tabs (đúng chuẩn Android)
+                defaultExternalAuthAction = ExternalAuthAction.CustomTabs()
+            }
 
             // Database REST API
             install(Postgrest)
         }
     }
 }
+
+

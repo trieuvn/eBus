@@ -1,4 +1,4 @@
-package com.example.project_bus
+package com.example.project_bus.data
 
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.project_bus.R
 import com.example.project_bus.data.Instrument
 import com.example.project_bus.data.InstrumentInsert
 import com.example.project_bus.data.SupabaseProvider
@@ -81,7 +82,7 @@ class SupabaseCrudTestActivity : AppCompatActivity() {
     private fun updateLast() = lifecycleScope.launch {
         val id = lastInsertedId
         if (id == null) {
-            logLine("UPDATE SKIP -> chưa có lastInsertedId, bấm INSERT trước")
+            logLine("UPDATE skipped: no lastInsertedId. Please run INSERT first.")
             return@launch
         }
 
@@ -109,7 +110,7 @@ class SupabaseCrudTestActivity : AppCompatActivity() {
     private fun deleteLast() = lifecycleScope.launch {
         val id = lastInsertedId
         if (id == null) {
-            logLine("DELETE SKIP -> chưa có lastInsertedId, bấm INSERT trước")
+            logLine("DELETE skipped: no lastInsertedId. Please run INSERT first.")
             return@launch
         }
 
@@ -134,3 +135,5 @@ class SupabaseCrudTestActivity : AppCompatActivity() {
         }
     }
 }
+
+

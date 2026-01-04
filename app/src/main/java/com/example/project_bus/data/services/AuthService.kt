@@ -3,7 +3,9 @@ package com.example.project_bus.data.services
 import com.example.project_bus.data.SupabaseProvider
 import com.example.project_bus.data.Tables
 import com.example.project_bus.data.models.AppUser
+import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
 import kotlinx.serialization.json.buildJsonObject
@@ -12,6 +14,15 @@ import kotlinx.serialization.json.put
 class AuthService {
 
     private val client = SupabaseProvider.client
+
+    /**
+     * Đăng nhập/đăng ký bằng Google (OAuth).
+     *
+     * Lưu ý: cần cấu hình Deeplink + Redirect URLs đúng để callback quay lại app.
+     */
+    suspend fun signInWithGoogle() {
+        client.auth.signInWith(Google)
+    }
 
     data class SignUpResult(
         val authId: String,
@@ -49,11 +60,11 @@ class AuthService {
             }
         }
 
-        // Theo docs: Confirm email ON => trả về user (session null)
-        // Confirm email OFF => trả về null (session có)
+        // If "Confirm email" is ON => Supabase returns a user (session is null)
+        // If "Confirm email" is OFF => Supabase returns null (session exists)
         val authId = signedUpUser?.id
             ?: client.auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("Không lấy được authId từ Supabase sau khi đăng ký.")
+            ?: throw IllegalStateException("Unable to get authId from Supabase after sign-up.")
 
         val isLoggedInNow = client.auth.currentUserOrNull() != null
         return SignUpResult(authId = authId, needsEmailConfirmation = !isLoggedInNow)
@@ -73,7 +84,7 @@ class AuthService {
         }
 
         val authId = client.auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("Đăng nhập thành công nhưng không có session/user.")
+            ?: throw IllegalStateException("Signed in successfully, but no session/user was returned.")
 
         return getProfileByAuthId(authId)
     }
@@ -82,7 +93,32 @@ class AuthService {
         client.auth.signOut()
     }
 
-    suspend fun getProfileByAuthId(authId: String): AppUser? {
+    /**
+     * Xác thực mã OTP (6 chữ số) được gửi trong email để hoàn tất signup.
+     *
+     * Supabase (Kotlin) xác thực OTP qua verifyEmailOtp().
+     * Lưu ý: Supabase dùng OtpType.Email.EMAIL để verify OTP code ({{ .Token }}).
+     */
+    suspend fun verifySignupOtp(email: String, otp: String) {
+        client.auth.verifyEmailOtp(
+            type = OtpType.Email.EMAIL,
+            email = email.trim(),
+            token = otp.trim()
+        )
+    }
+
+    /**
+     * Resend verification (signup confirmation) email.
+     * Supabase chỉ resend nếu trước đó đã có attempt signup/email change.
+     */
+    suspend fun resendSignupOtp(email: String) {
+        client.auth.resendEmail(OtpType.Email.SIGNUP, email.trim())
+    }
+
+    // Giữ lại tên cũ để các chỗ khác (nếu có) không bị vỡ.
+    suspend fun resendSignupConfirmation(email: String) = resendSignupOtp(email)
+
+suspend fun getProfileByAuthId(authId: String): AppUser? {
         val list = client
             .from(Tables.USERS)
             .select {
@@ -93,3 +129,5 @@ class AuthService {
         return list.firstOrNull()
     }
 }
+
+

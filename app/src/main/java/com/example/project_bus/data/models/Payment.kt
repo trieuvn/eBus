@@ -59,3 +59,5 @@ data class PaymentUpdate(
     @SerialName("payment_status")
     val paymentStatus: Int? = null
 )
+
+

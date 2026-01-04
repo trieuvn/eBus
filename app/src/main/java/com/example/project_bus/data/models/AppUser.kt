@@ -62,3 +62,5 @@ data class AppUserUpdate(
     @SerialName("role")
     val role: Int? = null
 )
+
+

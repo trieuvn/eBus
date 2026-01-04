@@ -6,6 +6,7 @@ import com.example.project_bus.data.models.RouteStop
 import com.example.project_bus.data.models.RouteStopCreate
 import com.example.project_bus.data.models.RouteStopUpdate
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 
 class RoutesStopService {
 
@@ -14,6 +15,14 @@ class RoutesStopService {
     suspend fun getAllStops(): List<RouteStop> =
         client.from(Tables.ROUTES_STOP)
             .select()
+            .decodeList<RouteStop>()
+
+    suspend fun getStopsByRouteId(routeId: Int): List<RouteStop> =
+        client.from(Tables.ROUTES_STOP)
+            .select {
+                filter { eq("route_id", routeId) }
+                order(column = "stop_order", order = Order.ASCENDING)
+            }
             .decodeList<RouteStop>()
 
     suspend fun getStopById(id: Int): RouteStop? =
@@ -48,3 +57,5 @@ class RoutesStopService {
             }
             .decodeSingle<RouteStop>()
 }
+
+
