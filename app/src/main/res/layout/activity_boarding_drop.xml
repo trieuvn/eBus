@@ -381,4 +381,3 @@
         <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_marginHorizontal="20dp" android:src="@drawable/ic_settings" app:tint="#FF8A80" />
     </LinearLayout>
 </RelativeLayout>
-

@@ -43,4 +43,3 @@ class BookingsAdapter(private val list: List<BookingItem>) :
 
     override fun getItemCount(): Int = list.size
 }
-

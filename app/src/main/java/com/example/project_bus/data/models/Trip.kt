@@ -56,4 +56,3 @@ data class TripUpdate(
     @SerialName("base_price") val basePrice: Int? = null,
     @SerialName("status") val status: Int? = null
 )
-

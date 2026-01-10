@@ -55,4 +55,3 @@ class TripsAdapter(
 
     override fun getItemCount() = trips.size
 }
-

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -40,16 +41,11 @@ class HomeActivity : AppCompatActivity() {
 
     // UI Elements
     private lateinit var tvUserName: TextView
-    private lateinit var etFrom: AutoCompleteTextView
-    private lateinit var etTo: AutoCompleteTextView
+    private lateinit var etFrom: EditText
+    private lateinit var etTo: EditText
     private lateinit var btnSearch: AppCompatButton
     private lateinit var btnSwap: ImageButton
     private lateinit var tvNoUpcoming: TextView
-
-    // Suggestions data (derived from Routes table)
-    private var routePairs: List<Pair<String, String>> = emptyList()
-    private var allOrigins: List<String> = emptyList()
-    private var allDestinations: List<String> = emptyList()
 
     // --- THAY ĐỔI QUAN TRỌNG: Dùng RecyclerView thay vì CardView lẻ ---
     private lateinit var rvBookings: RecyclerView
@@ -81,9 +77,6 @@ class HomeActivity : AppCompatActivity() {
 
         // Mặc định chọn "Hôm nay" khi vừa mở
         selectDateOption("TODAY")
-
-        // Load suggestion lists for origin/destination
-        loadLocationSuggestions()
 
         setupListeners()
         loadData(currentUser.id)
@@ -127,6 +120,159 @@ class HomeActivity : AppCompatActivity() {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
             }
+        }
+    }
+
+    private fun setupListeners() {
+        // Nút Tìm kiếm
+        btnSearch.setOnClickListener {
+            val fromLoc = etFrom.text.toString().trim()
+            val toLoc = etTo.text.toString().trim()
+
+            if (fromLoc.isEmpty() || toLoc.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập điểm đi và đến", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val intent = Intent(this, BookingActivity::class.java).apply {
+                putExtra("FROM_LOC", fromLoc)
+                putExtra("TO_LOC", toLoc)
+                putExtra("SELECTED_DATE", selectedDateStr)
+            }
+            startActivity(intent)
+        }
+
+        // Nút Đảo chiều
+        btnSwap.setOnClickListener {
+            val temp = etFrom.text.toString()
+            etFrom.setText(etTo.text.toString())
+            etTo.setText(temp)
+        }
+
+        // --- Sự kiện chọn ngày ---
+        btnToday.setOnClickListener { selectDateOption("TODAY") }
+        btnTomorrow.setOnClickListener { selectDateOption("TOMORROW") }
+        btnOtherDate.setOnClickListener { showDatePicker() }
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            val formattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+            selectedDateStr = formattedDate
+
+            resetDateButtonsUI()
+            btnOtherDate.alpha = 1.0f
+            tvOtherDateText.text = "$selectedDay/${selectedMonth + 1}"
+
+        }, year, month, day)
+
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+        datePickerDialog.show()
+    }
+
+    private fun selectDateOption(option: String) {
+        val calendar = Calendar.getInstance()
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        resetDateButtonsUI()
+
+        when (option) {
+            "TODAY" -> {
+                selectedDateStr = sdf.format(calendar.time)
+                btnToday.alpha = 1.0f
+            }
+            "TOMORROW" -> {
+                calendar.add(Calendar.DAY_OF_YEAR, 1)
+                selectedDateStr = sdf.format(calendar.time)
+                btnTomorrow.alpha = 1.0f
+            }
+        }
+    }
+
+    private fun resetDateButtonsUI() {
+        btnToday.alpha = 0.5f
+        btnTomorrow.alpha = 0.5f
+        btnOtherDate.alpha = 0.5f
+        tvOtherDateText.text = "Other"
+    }
+
+    private fun loadData(userId: String) = lifecycleScope.launch {
+        // A. Load Profile
+        try {
+            val userProfile = withContext(Dispatchers.IO) {
+                try { authService.getProfileByAuthId(userId) } catch (e: Exception) { null }
+            }
+            val name = userProfile?.fullName ?: SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
+            tvUserName.text = "Hello $name!"
+        } catch (e: Exception) { Log.e("Home", "Error profile: ${e.message}") }
+
+        // B. Load Bookings List (Sử dụng RecyclerView)
+        try {
+            val bookings = withContext(Dispatchers.IO) {
+                bookingsService.getBookingsByUserId(userId)
+            }
+
+            if (bookings.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    rvBookings.visibility = View.GONE
+                    tvNoUpcoming.visibility = View.VISIBLE
+                    tvNoUpcoming.text = "Bạn chưa có chuyến đi nào."
+                }
+                return@launch
+            }
+
+            // Chuyển đổi dữ liệu sang BookingItem cho Adapter
+            val uiList = mutableListOf<BookingItem>()
+            withContext(Dispatchers.IO) {
+                bookings.forEachIndexed { index, booking ->
+                    val trip = tripsService.getTripById(booking.tripId)
+                    if (trip != null) {
+                        val route = routesService.getRouteById(trip.routeId)
+                        val routeName = route?.name ?: "Unknown"
+
+                        var txtFrom = "Start"
+                        var txtTo = "End"
+                        if (routeName.contains("-") || routeName.contains("->")) {
+                            val separator = if (routeName.contains("->")) "->" else "-"
+                            val parts = routeName.split(separator)
+                            txtFrom = "From: " + parts[0].trim()
+                            txtTo = "To: " + parts[1].trim()
+                        } else {
+                            txtFrom = "From: $routeName"
+                            txtTo = ""
+                        }
+
+                        uiList.add(
+                            BookingItem(
+                                index = index + 1,
+                                fromLoc = txtFrom,
+                                toLoc = txtTo,
+                                time = trip.departureTime?.take(5) ?: "--:--",
+                                date = booking.createdAt?.take(10) ?: "Upcoming"
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Gán Adapter
+            withContext(Dispatchers.Main) {
+                if (uiList.isEmpty()) {
+                    tvNoUpcoming.visibility = View.VISIBLE
+                } else {
+                    tvNoUpcoming.visibility = View.GONE
+                    rvBookings.visibility = View.VISIBLE
+                    // QUAN TRỌNG: Gọi BookingsAdapter
+                    rvBookings.adapter = BookingsAdapter(uiList)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("Home", "Error bookings: ${e.message}")
         }
     }
 

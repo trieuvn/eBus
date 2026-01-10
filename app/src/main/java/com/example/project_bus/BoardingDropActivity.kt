@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.lifecycleScope
+import io.github.jan.supabase.auth.auth
 
 class BoardingDropActivity : AppCompatActivity() {
 
@@ -78,40 +79,40 @@ class BoardingDropActivity : AppCompatActivity() {
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         tvHeaderUser.text = "Hello $userEmail!"
 
-        // 4. Tải danh sách điểm đón/trả từ DB theo route của Trip
-        loadRouteStopsForTrip(tripId)
+        // 4. Xử lý nút chọn điểm Đón (Giả lập Menu)
+        layoutBoarding.setOnClickListener { view ->
+            val popup = PopupMenu(this, view)
+            // Thêm dữ liệu giả lập (Sau này lấy từ API)
+            popup.menu.add("Main Stand - $fromLoc")
+            popup.menu.add("Town Hall Stop")
+            popup.menu.add("Post Office Junction")
 
-        // 5. Chọn điểm Đón
-        layoutBoarding.setOnClickListener { anchor ->
-            val list = if (boardingStops.isNotEmpty()) boardingStops else emptyList()
-            showStopsPopup(
-                anchor = anchor,
-                stops = list,
-                fallbackItems = listOf("Main Stand - $fromLoc", "Town Hall Stop", "Post Office Junction")
-            ) { stopId, title ->
-                selectedBoardingStopId = stopId
-                selectedBoarding = title
+            popup.setOnMenuItemClickListener { item ->
+                selectedBoarding = item.title.toString()
                 tvSelectedBoarding.text = selectedBoarding
-                tvSelectedBoarding.setTextColor(resources.getColor(R.color.black, null))
+                tvSelectedBoarding.setTextColor(resources.getColor(R.color.black, null)) // Đổi màu chữ cho đậm
+                true
             }
+            popup.show()
         }
 
-        // 6. Chọn điểm Trả
-        layoutDrop.setOnClickListener { anchor ->
-            val list = if (dropStops.isNotEmpty()) dropStops else emptyList()
-            showStopsPopup(
-                anchor = anchor,
-                stops = list,
-                fallbackItems = listOf("Main Stand - $toLoc", "City Center", "New Bazaar Stop")
-            ) { stopId, title ->
-                selectedDropStopId = stopId
-                selectedDrop = title
+        // 5. Xử lý nút chọn điểm Trả
+        layoutDrop.setOnClickListener { view ->
+            val popup = PopupMenu(this, view)
+            popup.menu.add("Main Stand - $toLoc")
+            popup.menu.add("City Center")
+            popup.menu.add("New Bazaar Stop")
+
+            popup.setOnMenuItemClickListener { item ->
+                selectedDrop = item.title.toString()
                 tvSelectedDrop.text = selectedDrop
                 tvSelectedDrop.setTextColor(resources.getColor(R.color.black, null))
+                true
             }
+            popup.show()
         }
 
-        // 7. Nút Proceed (Tiếp tục sang thanh toán)
+        // 6. Nút Proceed (Tiếp tục sang thanh toán)
         btnNext.setOnClickListener {
             if (selectedBoarding.isEmpty() || selectedDrop.isEmpty()) {
                 Toast.makeText(this, "Please select Boarding and Drop points", Toast.LENGTH_SHORT).show()
@@ -124,75 +125,11 @@ class BoardingDropActivity : AppCompatActivity() {
                 nextIntent.putExtra("BOARDING_POINT", selectedBoarding)
                 nextIntent.putExtra("DROP_POINT", selectedDrop)
 
-                // Gửi cả stop_id để lưu vào Bookings
-                selectedBoardingStopId?.let { nextIntent.putExtra("PICKUP_STOP_ID", it) }
-                selectedDropStopId?.let { nextIntent.putExtra("DROPOFF_STOP_ID", it) }
-
                 startActivity(nextIntent)
             }
         }
 
         btnBack.setOnClickListener { finish() }
-    }
-
-    private fun loadRouteStopsForTrip(tripId: Long) {
-        if (tripId <= 0L) return
-
-        lifecycleScope.launch {
-            try {
-                val trip = withContext(Dispatchers.IO) { tripsService.getTripById(tripId) }
-                val routeId = trip?.routeId
-                if (routeId == null) return@launch
-
-                val allStops = withContext(Dispatchers.IO) { routesStopService.getStopsByRouteId(routeId) }
-                // stopType is an Int in DB. Common convention: 1 = pickup/boarding, 2 = dropoff.
-                val pickups = allStops.filter { it.stopType == 1 }
-                val drops = allStops.filter { it.stopType == 2 }
-
-                boardingStops = if (pickups.isNotEmpty()) pickups else allStops
-                dropStops = if (drops.isNotEmpty()) drops else allStops
-
-            } catch (e: Exception) {
-                Toast.makeText(this@BoardingDropActivity, "Failed to load boarding points: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    /**
-     * Shows a popup menu for RouteStop list (or fallback string items).
-     * onSelected provides (stopId?, title).
-     */
-    private fun showStopsPopup(
-        anchor: View,
-        stops: List<RouteStop>,
-        fallbackItems: List<String>,
-        onSelected: (Int?, String) -> Unit
-    ) {
-        val popup = PopupMenu(this, anchor)
-
-        if (stops.isNotEmpty()) {
-            stops.forEachIndexed { idx, stop ->
-                val title = stop.locationName ?: "Stop ${stop.id ?: idx}"
-                val id = stop.id ?: (100000 + idx)
-                popup.menu.add(0, id, idx, title)
-            }
-        } else {
-            fallbackItems.forEachIndexed { idx, title ->
-                popup.menu.add(0, 100000 + idx, idx, title)
-            }
-        }
-
-        popup.setOnMenuItemClickListener { item ->
-            val title = item.title.toString()
-            // Map back to a real stop id if it exists in the provided list
-            val matchedStopId = stops.firstOrNull {
-                val stopTitle = it.locationName ?: "Stop ${it.id}"
-                stopTitle == title
-            }?.id
-            onSelected(matchedStopId, title)
-            true
-        }
-        popup.show()
     }
 }
 

@@ -52,20 +52,16 @@ class GuestDetailsActivity : AppCompatActivity() {
                 val contactMobile = findViewById<EditText>(R.id.etContactMobile).text.toString()
                 val contactEmail = findViewById<EditText>(R.id.etContactEmail).text.toString()
 
-                // Collect passenger full names in the same order as SELECTED_SEATS
-                val passengerNames = passengerInputViews.map { it.etName.text.toString().trim() }
-                val contactName = passengerNames.firstOrNull().orEmpty()
-
                 val nextIntent = Intent(this, PaymentActivity::class.java)
                 nextIntent.putExtras(intent) // Chuyển tiếp toàn bộ dữ liệu cũ
 
                 // Gửi thông tin liên hệ
                 nextIntent.putExtra("CONTACT_MOBILE", contactMobile)
                 nextIntent.putExtra("CONTACT_EMAIL", contactEmail)
-                nextIntent.putExtra("CONTACT_NAME", contactName)
 
-                // Gửi danh sách tên hành khách để PaymentActivity lưu vào Booking_passengers
-                nextIntent.putStringArrayListExtra("PASSENGER_NAMES", ArrayList(passengerNames))
+                // Gửi danh sách tên hành khách (nếu cần thiết cho vé)
+                // val passengerNames = passengerInputViews.map { it.etName.text.toString() }
+                // nextIntent.putStringArrayListExtra("PASSENGER_NAMES", ArrayList(passengerNames))
 
                 startActivity(nextIntent)
             }
@@ -116,4 +112,3 @@ class GuestDetailsActivity : AppCompatActivity() {
         val rgGender: RadioGroup
     )
 }
-

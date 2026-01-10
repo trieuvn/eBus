@@ -57,4 +57,3 @@ class SeatAdapter(
 
     override fun getItemCount() = seats.size
 }
-

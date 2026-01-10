@@ -55,4 +55,3 @@ class BookingsService {
             filter { eq("id", id) }
         }.decodeSingle<Booking>()
 }
-
