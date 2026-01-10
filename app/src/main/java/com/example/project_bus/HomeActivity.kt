@@ -1,29 +1,33 @@
 package com.example.project_bus
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.project_bus.data.SupabaseProvider
-import com.example.project_bus.data.models.Booking
 import com.example.project_bus.data.services.AuthService
 import com.example.project_bus.data.services.BookingsService
 import com.example.project_bus.data.services.RoutesService
 import com.example.project_bus.data.services.TripsService
 import com.example.project_bus.ui.auth.LoginActivity
-// Import quan trọng để dùng tính năng Auth
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
 
@@ -41,41 +45,38 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var btnSwap: ImageButton
     private lateinit var tvNoUpcoming: TextView
 
-    // Card 1
-    private lateinit var cardUpcoming1: CardView
-    private lateinit var tvUp1From: TextView
-    private lateinit var tvUp1To: TextView
-    private lateinit var tvUp1Time: TextView
-    private lateinit var tvUp1Date: TextView
+    // --- THAY ĐỔI QUAN TRỌNG: Dùng RecyclerView thay vì CardView lẻ ---
+    private lateinit var rvBookings: RecyclerView
 
-    // Card 2
-    private lateinit var cardUpcoming2: CardView
-    private lateinit var tvUp2From: TextView
-    private lateinit var tvUp2To: TextView
-    private lateinit var tvUp2Time: TextView
-    private lateinit var tvUp2Date: TextView
+    // Các nút chọn ngày
+    private lateinit var btnToday: TextView
+    private lateinit var btnTomorrow: TextView
+    private lateinit var btnOtherDate: LinearLayout
+    private lateinit var tvOtherDateText: TextView
+
+    // Biến lưu ngày đã chọn (Mặc định là hôm nay)
+    private var selectedDateStr: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // --- BƯỚC 1: KIỂM TRA ĐĂNG NHẬP CHUẨN ---
+        // 1. Kiểm tra Auth (Bắt buộc phải đăng nhập)
         val currentUser = SupabaseProvider.client.auth.currentUserOrNull()
-
         if (currentUser == null) {
-            // Nếu chưa đăng nhập, đá về trang Login ngay lập tức
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
             return
         }
-        // ----------------------------------------
 
         initViews()
-        setupListeners()
 
-        // --- BƯỚC 2: TẢI DỮ LIỆU CỦA USER ĐANG ĐĂNG NHẬP ---
+        // Mặc định chọn "Hôm nay" khi vừa mở
+        selectDateOption("TODAY")
+
+        setupListeners()
         loadData(currentUser.id)
     }
 
@@ -86,128 +87,190 @@ class HomeActivity : AppCompatActivity() {
         btnSearch = findViewById(R.id.btnSearch)
         btnSwap = findViewById(R.id.btnSwap)
 
-        // Xử lý an toàn nếu view tvNoUpcoming chưa có trong layout
+        // Tránh lỗi null nếu view chưa có
         tvNoUpcoming = try { findViewById(R.id.tvNoUpcoming) } catch (e: Exception) { null } ?: TextView(this)
 
-        // Card 1
-        cardUpcoming1 = findViewById(R.id.cardUpcoming1)
-        tvUp1From = findViewById(R.id.tvUp1From)
-        tvUp1To = findViewById(R.id.tvUp1To)
-        tvUp1Time = findViewById(R.id.tvUp1Time)
-        tvUp1Date = findViewById(R.id.tvUp1Date)
+        // Date Buttons
+        btnToday = findViewById(R.id.btnToday)
+        btnTomorrow = findViewById(R.id.btnTomorrow)
+        btnOtherDate = findViewById(R.id.btnOtherDate)
+        tvOtherDateText = findViewById(R.id.tvOtherDateText)
 
-        // Card 2
-        cardUpcoming2 = findViewById(R.id.cardUpcoming2)
-        tvUp2From = findViewById(R.id.tvUp2From)
-        tvUp2To = findViewById(R.id.tvUp2To)
-        tvUp2Time = findViewById(R.id.tvUp2Time)
-        tvUp2Date = findViewById(R.id.tvUp2Date)
+        // --- Setup RecyclerView (Danh sách cuộn) ---
+        rvBookings = findViewById(R.id.rvBookings)
+        rvBookings.layoutManager = LinearLayoutManager(this)
 
-        // Setup Bottom Nav Link
-        val navTicket = findViewById<View>(R.id.navTicket)
-        navTicket?.setOnClickListener {
+        // --- Bottom Navigation ---
+        findViewById<View>(R.id.navTicket)?.setOnClickListener {
             startActivity(Intent(this, BookingActivity::class.java))
+        }
+
+        findViewById<View>(R.id.navWallet)?.setOnClickListener {
+            Toast.makeText(this, "Chức năng Ví đang phát triển", Toast.LENGTH_SHORT).show()
+        }
+
+        // Nút Settings -> Đăng xuất
+        findViewById<View>(R.id.navSettings)?.setOnClickListener {
+            lifecycleScope.launch {
+                SupabaseProvider.client.auth.signOut()
+                Toast.makeText(this@HomeActivity, "Đã đăng xuất", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@HomeActivity, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
         }
     }
 
     private fun setupListeners() {
+        // Nút Tìm kiếm
         btnSearch.setOnClickListener {
             val fromLoc = etFrom.text.toString().trim()
             val toLoc = etTo.text.toString().trim()
+
             if (fromLoc.isEmpty() || toLoc.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập điểm đi và đến", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
             val intent = Intent(this, BookingActivity::class.java).apply {
                 putExtra("FROM_LOC", fromLoc)
                 putExtra("TO_LOC", toLoc)
+                putExtra("SELECTED_DATE", selectedDateStr)
             }
             startActivity(intent)
         }
 
+        // Nút Đảo chiều
         btnSwap.setOnClickListener {
             val temp = etFrom.text.toString()
             etFrom.setText(etTo.text.toString())
             etTo.setText(temp)
         }
+
+        // --- Sự kiện chọn ngày ---
+        btnToday.setOnClickListener { selectDateOption("TODAY") }
+        btnTomorrow.setOnClickListener { selectDateOption("TOMORROW") }
+        btnOtherDate.setOnClickListener { showDatePicker() }
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            val formattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+            selectedDateStr = formattedDate
+
+            resetDateButtonsUI()
+            btnOtherDate.alpha = 1.0f
+            tvOtherDateText.text = "$selectedDay/${selectedMonth + 1}"
+
+        }, year, month, day)
+
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+        datePickerDialog.show()
+    }
+
+    private fun selectDateOption(option: String) {
+        val calendar = Calendar.getInstance()
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        resetDateButtonsUI()
+
+        when (option) {
+            "TODAY" -> {
+                selectedDateStr = sdf.format(calendar.time)
+                btnToday.alpha = 1.0f
+            }
+            "TOMORROW" -> {
+                calendar.add(Calendar.DAY_OF_YEAR, 1)
+                selectedDateStr = sdf.format(calendar.time)
+                btnTomorrow.alpha = 1.0f
+            }
+        }
+    }
+
+    private fun resetDateButtonsUI() {
+        btnToday.alpha = 0.5f
+        btnTomorrow.alpha = 0.5f
+        btnOtherDate.alpha = 0.5f
+        tvOtherDateText.text = "Other"
     }
 
     private fun loadData(userId: String) = lifecycleScope.launch {
-        // 1. Load Profile
+        // A. Load Profile
         try {
             val userProfile = withContext(Dispatchers.IO) {
                 try { authService.getProfileByAuthId(userId) } catch (e: Exception) { null }
             }
-            // Hiển thị tên hoặc email nếu chưa có tên
             val name = userProfile?.fullName ?: SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
             tvUserName.text = "Hello $name!"
-        } catch (e: Exception) {
-            Log.e("HomeActivity", "Error loading profile: ${e.message}")
-        }
+        } catch (e: Exception) { Log.e("Home", "Error profile: ${e.message}") }
 
-        // 2. Load Bookings
+        // B. Load Bookings List (Sử dụng RecyclerView)
         try {
             val bookings = withContext(Dispatchers.IO) {
                 bookingsService.getBookingsByUserId(userId)
             }
 
-            // Ẩn các card trước khi bind dữ liệu mới
-            withContext(Dispatchers.Main) {
-                cardUpcoming1.visibility = View.GONE
-                cardUpcoming2.visibility = View.GONE
-            }
-
             if (bookings.isEmpty()) {
-                // Có thể hiển thị text thông báo "Bạn chưa có vé" ở đây nếu muốn
+                withContext(Dispatchers.Main) {
+                    rvBookings.visibility = View.GONE
+                    tvNoUpcoming.visibility = View.VISIBLE
+                    tvNoUpcoming.text = "Bạn chưa có chuyến đi nào."
+                }
                 return@launch
             }
 
-            if (bookings.isNotEmpty()) {
-                bindBookingToCard(bookings[0], cardUpcoming1, tvUp1From, tvUp1To, tvUp1Time, tvUp1Date)
-            }
-            if (bookings.size > 1) {
-                bindBookingToCard(bookings[1], cardUpcoming2, tvUp2From, tvUp2To, tvUp2Time, tvUp2Date)
-            }
+            // Chuyển đổi dữ liệu sang BookingItem cho Adapter
+            val uiList = mutableListOf<BookingItem>()
+            withContext(Dispatchers.IO) {
+                bookings.forEachIndexed { index, booking ->
+                    val trip = tripsService.getTripById(booking.tripId)
+                    if (trip != null) {
+                        val route = routesService.getRouteById(trip.routeId)
+                        val routeName = route?.name ?: "Unknown"
 
-        } catch (e: Exception) {
-            Log.e("HomeActivity", "Error loading bookings: ${e.message}")
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@HomeActivity, "Lỗi tải dữ liệu vé", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+                        var txtFrom = "Start"
+                        var txtTo = "End"
+                        if (routeName.contains("-") || routeName.contains("->")) {
+                            val separator = if (routeName.contains("->")) "->" else "-"
+                            val parts = routeName.split(separator)
+                            txtFrom = "From: " + parts[0].trim()
+                            txtTo = "To: " + parts[1].trim()
+                        } else {
+                            txtFrom = "From: $routeName"
+                            txtTo = ""
+                        }
 
-    private suspend fun bindBookingToCard(
-        booking: Booking,
-        card: CardView,
-        tvFrom: TextView,
-        tvTo: TextView,
-        tvTime: TextView,
-        tvDate: TextView
-    ) {
-        withContext(Dispatchers.IO) {
-            val trip = tripsService.getTripById(booking.tripId)
-            if (trip != null) {
-                val route = routesService.getRouteById(trip.routeId)
-
-                withContext(Dispatchers.Main) {
-                    val routeName = route?.name ?: "Unknown Route"
-                    if (routeName.contains("-") || routeName.contains("->")) {
-                        // Xử lý tách chuỗi tên tuyến đường
-                        val separator = if (routeName.contains("->")) "->" else "-"
-                        val parts = routeName.split(separator)
-                        tvFrom.text = "From : ${parts[0].trim()}"
-                        tvTo.text = "To : ${parts[1].trim()}"
-                    } else {
-                        tvFrom.text = "From : $routeName"
-                        tvTo.text = "To : ..."
+                        uiList.add(
+                            BookingItem(
+                                index = index + 1,
+                                fromLoc = txtFrom,
+                                toLoc = txtTo,
+                                time = trip.departureTime?.take(5) ?: "--:--",
+                                date = booking.createdAt?.take(10) ?: "Upcoming"
+                            )
+                        )
                     }
-
-                    tvTime.text = trip.departureTime?.take(5) ?: "00:00"
-                    tvDate.text = booking.createdAt?.take(10) ?: "Upcoming"
-                    card.visibility = View.VISIBLE
                 }
             }
+
+            // Gán Adapter
+            withContext(Dispatchers.Main) {
+                if (uiList.isEmpty()) {
+                    tvNoUpcoming.visibility = View.VISIBLE
+                } else {
+                    tvNoUpcoming.visibility = View.GONE
+                    rvBookings.visibility = View.VISIBLE
+                    // QUAN TRỌNG: Gọi BookingsAdapter
+                    rvBookings.adapter = BookingsAdapter(uiList)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("Home", "Error bookings: ${e.message}")
         }
     }
 }
