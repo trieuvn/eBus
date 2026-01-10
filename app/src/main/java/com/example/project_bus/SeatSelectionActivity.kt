@@ -131,23 +131,4 @@ class SeatSelectionActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleSeat(seat: Seat) {
-        if (seat.status == 0) {
-            seat.status = 2 // Chọn
-            selectedSeats.add(seat.id)
-        } else if (seat.status == 2) {
-            seat.status = 0 // Bỏ chọn
-            selectedSeats.remove(seat.id)
-        }
-
-        adapter.notifyDataSetChanged()
-
-        val total = selectedSeats.size * ticketPrice
-        if (selectedSeats.isEmpty()) {
-            btnConfirmSeat.text = "Select a seat"
-        } else {
-            btnConfirmSeat.text = "Proceed to Boarding (LKR ${total.toInt()})"
-        }
     }
-}
-
