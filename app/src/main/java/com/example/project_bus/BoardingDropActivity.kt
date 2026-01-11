@@ -9,6 +9,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project_bus.data.SupabaseProvider
+import com.example.project_bus.data.models.RouteStop
+import com.example.project_bus.data.services.RoutesStopService
+import com.example.project_bus.data.services.TripsService
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
 import io.github.jan.supabase.auth.auth
 
 class BoardingDropActivity : AppCompatActivity() {
@@ -16,6 +24,15 @@ class BoardingDropActivity : AppCompatActivity() {
     // Biến lưu dữ liệu
     private var selectedBoarding: String = ""
     private var selectedDrop: String = ""
+
+    private var selectedBoardingStopId: Int? = null
+    private var selectedDropStopId: Int? = null
+
+    private val tripsService = TripsService()
+    private val routesStopService = RoutesStopService()
+
+    private var boardingStops: List<RouteStop> = emptyList()
+    private var dropStops: List<RouteStop> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +57,7 @@ class BoardingDropActivity : AppCompatActivity() {
         val btnBack = findViewById<View>(R.id.btnBack)
 
         // 2. Nhận dữ liệu từ Intent
+        val tripId = intent.getLongExtra("TRIP_ID", 0L)
         val operator = intent.getStringExtra("OPERATOR") ?: "Bus"
         val busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
         val fromLoc = intent.getStringExtra("FROM_LOC") ?: "Start"
@@ -114,3 +132,4 @@ class BoardingDropActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
     }
 }
+

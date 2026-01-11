@@ -5,7 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.EditText
+import android.widget.AutoCompleteTextView
+import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -39,8 +40,8 @@ class HomeActivity : AppCompatActivity() {
 
     // UI Elements
     private lateinit var tvUserName: TextView
-    private lateinit var etFrom: EditText
-    private lateinit var etTo: EditText
+    private lateinit var etFrom: AutoCompleteTextView
+    private lateinit var etTo: AutoCompleteTextView
     private lateinit var btnSearch: AppCompatButton
     private lateinit var btnSwap: ImageButton
     private lateinit var tvNoUpcoming: TextView
@@ -56,6 +57,12 @@ class HomeActivity : AppCompatActivity() {
 
     // Biến lưu ngày đã chọn (Mặc định là hôm nay)
     private var selectedDateStr: String = ""
+
+    // --- Data for origin/destination suggestions (Routes) ---
+    private var routePairs: List<Pair<String, String>> = emptyList()
+    private var allOrigins: List<String> = emptyList()
+    private var allDestinations: List<String> = emptyList()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +84,7 @@ class HomeActivity : AppCompatActivity() {
         selectDateOption("TODAY")
 
         setupListeners()
+        loadLocationSuggestions()
         loadData(currentUser.id)
     }
 
@@ -106,14 +114,14 @@ class HomeActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.navWallet)?.setOnClickListener {
-            Toast.makeText(this, "Chức năng Ví đang phát triển", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Wallet feature is under development.", Toast.LENGTH_SHORT).show()
         }
 
         // Nút Settings -> Đăng xuất
         findViewById<View>(R.id.navSettings)?.setOnClickListener {
             lifecycleScope.launch {
                 SupabaseProvider.client.auth.signOut()
-                Toast.makeText(this@HomeActivity, "Đã đăng xuất", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@HomeActivity, "Signed out.", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@HomeActivity, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
@@ -128,7 +136,7 @@ class HomeActivity : AppCompatActivity() {
             val toLoc = etTo.text.toString().trim()
 
             if (fromLoc.isEmpty() || toLoc.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập điểm đi và đến", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter origin and destination.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -145,6 +153,9 @@ class HomeActivity : AppCompatActivity() {
             val temp = etFrom.text.toString()
             etFrom.setText(etTo.text.toString())
             etTo.setText(temp)
+
+            // After swapping, refresh destination suggestions based on new origin
+            updateDestinationSuggestions(etFrom.text.toString())
         }
 
         // --- Sự kiện chọn ngày ---
@@ -197,6 +208,85 @@ class HomeActivity : AppCompatActivity() {
         btnTomorrow.alpha = 0.5f
         btnOtherDate.alpha = 0.5f
         tvOtherDateText.text = "Other"
+    }
+
+    /**
+     * Load origin/destination suggestions from the Routes table (Supabase).
+     * Route names are expected in formats like "TP.HCM -> Vũng Tàu" or "Hà Nội - Hải Phòng".
+     */
+    private fun loadLocationSuggestions() = lifecycleScope.launch {
+        try {
+            val routes = withContext(Dispatchers.IO) { routesService.getAllRoutes() }
+
+            val pairs = routes.mapNotNull { parseRouteName(it.name) }
+            routePairs = pairs
+
+            allOrigins = pairs.map { it.first }.distinct().sorted()
+            allDestinations = pairs.map { it.second }.distinct().sorted()
+
+            // Setup adapters
+            setupAutoComplete(etFrom, allOrigins)
+            setupAutoComplete(etTo, allDestinations)
+
+            // When selecting an origin, restrict destination suggestions
+            etFrom.setOnItemClickListener { _, _, _, _ ->
+                updateDestinationSuggestions(etFrom.text.toString())
+            }
+
+        } catch (e: Exception) {
+            Log.e("Home", "Error loading location suggestions: ${e.message}")
+        }
+    }
+
+    private fun setupAutoComplete(view: AutoCompleteTextView, items: List<String>) {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, items)
+        view.setAdapter(adapter)
+
+        // Show dropdown when user taps into the field.
+        // NOTE: AutoCompleteTextView normally requires enough characters to filter.
+        // We use InstantAutoCompleteTextView (custom view) in XML to always allow dropdown.
+        view.setOnClickListener { view.showDropDown() }
+        view.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) view.showDropDown()
+        }
+    }
+
+    private fun updateDestinationSuggestions(originRaw: String) {
+        val origin = originRaw.trim()
+        val dests = if (origin.isBlank()) {
+            allDestinations
+        } else {
+            routePairs
+                .filter { it.first.equals(origin, ignoreCase = true) }
+                .map { it.second }
+                .distinct()
+                .sorted()
+                .ifEmpty { allDestinations }
+        }
+
+        etTo.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, dests))
+
+        // If the currently typed destination is not valid for the selected origin, clear it
+        val currentTo = etTo.text.toString().trim()
+        if (origin.isNotBlank() && currentTo.isNotBlank() && dests.none { it.equals(currentTo, ignoreCase = true) }) {
+            etTo.setText("")
+        }
+    }
+
+    private fun parseRouteName(routeNameRaw: String): Pair<String, String>? {
+        val routeName = routeNameRaw.trim()
+        if (routeName.isBlank()) return null
+
+        // Supported separators: "->", "→", "-"
+        val separators = listOf("->", "→", "-")
+        val sep = separators.firstOrNull { routeName.contains(it) } ?: return null
+        val idx = routeName.indexOf(sep)
+        if (idx <= 0 || idx >= routeName.length - sep.length) return null
+
+        val from = routeName.substring(0, idx).trim()
+        val to = routeName.substring(idx + sep.length).trim()
+        if (from.isBlank() || to.isBlank()) return null
+        return Pair(from, to)
     }
 
     private fun loadData(userId: String) = lifecycleScope.launch {

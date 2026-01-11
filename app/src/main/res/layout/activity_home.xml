@@ -86,7 +86,7 @@
                 android:background="@drawable/bg_red_rounded_box"
                 android:padding="20dp">
 
-                <EditText
+                <com.example.project_bus.ui.widgets.InstantAutoCompleteTextView
                     android:id="@+id/etFrom"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -94,6 +94,7 @@
                     android:autofillHints="postalAddress"
                     android:background="@drawable/bg_input_field"
                     android:hint="@string/hint_boarding"
+                    android:completionThreshold="1"
                     android:inputType="textCapSentences"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
@@ -114,7 +115,7 @@
                     android:src="@drawable/ic_swap"
                     app:tint="#FFF" />
 
-                <EditText
+                <com.example.project_bus.ui.widgets.InstantAutoCompleteTextView
                     android:id="@+id/etTo"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -123,6 +124,7 @@
                     android:autofillHints="postalAddress"
                     android:background="@drawable/bg_input_field"
                     android:hint="@string/hint_destination"
+                    android:completionThreshold="1"
                     android:inputType="textCapSentences"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
@@ -276,3 +278,4 @@
     </LinearLayout>
 
 </RelativeLayout>
+

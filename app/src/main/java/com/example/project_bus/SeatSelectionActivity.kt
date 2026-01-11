@@ -130,4 +130,5 @@ class SeatSelectionActivity : AppCompatActivity() {
             btnConfirmSeat.text = "Proceed to Boarding (LKR ${total.toInt()})"
         }
     }
-}
+
+    }

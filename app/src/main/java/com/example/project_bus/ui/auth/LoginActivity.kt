@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,15 +29,16 @@ class LoginActivity : AppCompatActivity() {
         val edtPassword = findViewById<EditText>(R.id.edtPassword)
         val btnSignIn = findViewById<Button>(R.id.btnSignIn)
         val txtGoRegister = findViewById<TextView>(R.id.txtGoRegister)
+        val btnGoogleSignIn = findViewById<LinearLayout>(R.id.btnGoogleSignIn)
 
         btnSignIn.setOnClickListener {
             val email = edtEmail.text.toString().trim()
             val password = edtPassword.text.toString()
 
             when {
-                email.isBlank() -> toast("Vui lòng nhập email")
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Email không hợp lệ")
-                password.isBlank() -> toast("Vui lòng nhập mật khẩu")
+                email.isBlank() -> toast("Please enter your email")
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Invalid email address")
+                password.isBlank() -> toast("Please enter your password")
                 else -> {
                     // Disable nút để tránh bấm nhiều lần
                     btnSignIn.isEnabled = false
@@ -49,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
                             }
 
                             // --- KHU VỰC QUAN TRỌNG NHẤT ---
-                            toast("Đăng nhập thành công!")
+                            toast("Signed in successfully!")
 
                             // Chuyển sang HomeActivity
                             val intent = Intent(this@LoginActivity, HomeActivity::class.java)
@@ -60,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
                             // -------------------------------
 
                         } catch (e: Exception) {
-                            toast("Lỗi: ${friendlyAuthMessage(e)}")
+                            toast("Error: ${friendlyAuthMessage(e)}")
                             btnSignIn.isEnabled = true // Mở lại nút nếu lỗi
                         }
                     }
@@ -73,6 +75,22 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+
+        // Google OAuth sign-in
+        btnGoogleSignIn.setOnClickListener {
+            btnGoogleSignIn.isEnabled = false
+            lifecycleScope.launch {
+                try {
+                    authService.signInWithGoogle()
+                    toast("Continue with Google in your browser...")
+                    // Sau khi login xong, Supabase sẽ redirect về deeplink và AuthCallbackActivity sẽ tự đưa về Home.
+                } catch (e: Exception) {
+                    toast("Error: ${friendlyAuthMessage(e)}")
+                } finally {
+                    btnGoogleSignIn.isEnabled = true
+                }
+            }
+        }
     }
 
     private fun toast(msg: String) {
@@ -82,9 +100,10 @@ class LoginActivity : AppCompatActivity() {
     private fun friendlyAuthMessage(e: Throwable): String {
         val msg = e.message ?: e.toString()
         return when {
-            msg.contains("invalid_credentials", true) -> "Sai email hoặc mật khẩu"
-            msg.contains("email_not_confirmed", true) -> "Email chưa xác thực"
+            msg.contains("invalid_credentials", true) -> "Incorrect email or password."
+            msg.contains("email_not_confirmed", true) -> "Email not verified. Please check your inbox and click the verification link."
             else -> msg
         }
     }
 }
+

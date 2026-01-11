@@ -47,6 +47,20 @@
         android:textColor="@color/text_pinkish"
         android:textSize="15sp" />
 
+    
+
+<TextView
+    android:id="@+id/tvResendEmail"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:padding="10dp"
+    android:text="Resend verification email"
+    android:textColor="@color/brand_red"
+    android:textSize="15sp"
+    android:textStyle="bold" />
+
+
     <TextView
         android:id="@+id/tvSignIn"
         android:layout_width="wrap_content"
@@ -58,3 +72,4 @@
         android:textStyle="bold" />
 
 </LinearLayout>
+

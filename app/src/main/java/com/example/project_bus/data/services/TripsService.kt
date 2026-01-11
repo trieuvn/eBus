@@ -51,3 +51,5 @@ class TripsService {
             }
             .decodeSingle<Trip>()
 }
+
+
