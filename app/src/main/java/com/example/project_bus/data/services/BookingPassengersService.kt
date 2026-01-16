@@ -45,6 +45,10 @@ class BookingPassengersService {
                 filter { eq("id", id) }
             }
             .decodeSingle<BookingPassenger>()
+
+    suspend fun getPassengersByBookingId(bookingId: Long): List<BookingPassenger> =
+        client.from(Tables.BOOKING_PASSENGERS)
+            .select { filter { eq("booking_id", bookingId) } }
+            .decodeList<BookingPassenger>()
+
 }
-
-

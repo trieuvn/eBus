@@ -16,7 +16,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/tvIndex"
+            android:id="@+id/tvHistoryIndex"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@drawable/bg_booking_item_left"
@@ -38,14 +38,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bus terminal 1"
+                android:text="Bus Route"
                 android:textColor="#000"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:layout_marginBottom="6dp"/>
 
             <TextView
-                android:id="@+id/tvFrom"
+                android:id="@+id/tvHistoryOrigin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="From: Kelaniya"
@@ -53,7 +53,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tvTo"
+                android:id="@+id/tvHistoryDestination"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -74,29 +74,28 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="departure time"
+                android:text="Departure"
                 android:textColor="#AAAAAA"
-                android:textSize="10sp" 
+                android:textSize="10sp"
                 android:textAllCaps="false"/>
 
             <TextView
-                android:id="@+id/tvTime"
+                android:id="@+id/tvHistoryTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="9 AM , Sun"
+                android:text="9 AM"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginTop="4dp"/>
 
             <TextView
-                android:id="@+id/tvDate"
+                android:id="@+id/tvHistoryDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2024.12.08"
                 android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold"
+                android:textSize="12sp"
                 android:layout_marginTop="2dp"/>
         </LinearLayout>
     </LinearLayout>

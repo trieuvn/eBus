@@ -38,17 +38,18 @@ class HomeActivity : AppCompatActivity() {
     private val tripsService = TripsService()
     private val routesService = RoutesService()
 
-    private lateinit var tvUserName: TextView
-    private lateinit var etFrom: InstantAutoCompleteTextView
-    private lateinit var etTo: InstantAutoCompleteTextView
-    private lateinit var btnSearch: AppCompatButton
-    private lateinit var btnSwap: ImageButton
-    private lateinit var tvNoUpcoming: TextView
-    private lateinit var rvBookings: RecyclerView
-    private lateinit var btnToday: TextView
-    private lateinit var btnTomorrow: TextView
-    private lateinit var btnOtherDate: LinearLayout
-    private lateinit var tvOtherDateText: TextView
+    private lateinit var tvHomeUserName: TextView
+    private lateinit var actvHomeOrigin: InstantAutoCompleteTextView
+    private lateinit var actvHomeDestination: InstantAutoCompleteTextView
+    private lateinit var btnHomeFindBus: AppCompatButton
+    private lateinit var btnHomeSwapLocations: ImageButton
+    private lateinit var tvHomeNoHistory: TextView
+    private lateinit var rvHomeBookingHistory: RecyclerView
+    private lateinit var btnHomeDateToday: TextView
+    private lateinit var btnHomeDateTomorrow: TextView
+    private lateinit var btnHomeDateOther: LinearLayout
+    private lateinit var tvHomeDateOtherText: TextView
+    
     private var selectedDateStr: String = ""
     private var routePairs: List<Pair<String, String>> = emptyList()
     private var allOrigins: List<String> = emptyList()
@@ -57,6 +58,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        
         val currentUser = SupabaseProvider.client.auth.currentUserOrNull()
         if (currentUser == null) {
             val intent = Intent(this, LoginActivity::class.java)
@@ -65,6 +67,7 @@ class HomeActivity : AppCompatActivity() {
             finish()
             return
         }
+        
         initViews()
         selectDateOption("TODAY")
         setupListeners()
@@ -73,18 +76,20 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        tvUserName = findViewById(R.id.tvUserName)
-        etFrom = findViewById(R.id.etFrom)
-        etTo = findViewById(R.id.etTo)
-        btnSearch = findViewById(R.id.btnSearch)
-        btnSwap = findViewById(R.id.btnSwap)
-        tvNoUpcoming = findViewById(R.id.tvNoUpcoming)
-        rvBookings = findViewById(R.id.rvBookings)
-        rvBookings.layoutManager = LinearLayoutManager(this)
-        btnToday = findViewById(R.id.btnToday)
-        btnTomorrow = findViewById(R.id.btnTomorrow)
-        btnOtherDate = findViewById(R.id.btnOtherDate)
-        tvOtherDateText = findViewById(R.id.tvOtherDateText)
+        tvHomeUserName = findViewById(R.id.tvHomeUserName)
+        actvHomeOrigin = findViewById(R.id.actvHomeOrigin)
+        actvHomeDestination = findViewById(R.id.actvHomeDestination)
+        btnHomeFindBus = findViewById(R.id.btnHomeFindBus)
+        btnHomeSwapLocations = findViewById(R.id.btnHomeSwapLocations)
+        tvHomeNoHistory = findViewById(R.id.tvHomeNoHistory)
+        rvHomeBookingHistory = findViewById(R.id.rvHomeBookingHistory)
+        rvHomeBookingHistory.layoutManager = LinearLayoutManager(this)
+        
+        btnHomeDateToday = findViewById(R.id.btnHomeDateToday)
+        btnHomeDateTomorrow = findViewById(R.id.btnHomeDateTomorrow)
+        btnHomeDateOther = findViewById(R.id.btnHomeDateOther)
+        tvHomeDateOtherText = findViewById(R.id.tvHomeDateOtherText)
+        
         findViewById<View>(R.id.navTicket)?.setOnClickListener { startActivity(Intent(this, BookingActivity::class.java)) }
         findViewById<View>(R.id.navWallet)?.setOnClickListener { Toast.makeText(this, "Wallet feature is under development.", Toast.LENGTH_SHORT).show() }
         findViewById<View>(R.id.navSettings)?.setOnClickListener {
@@ -98,9 +103,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        btnSearch.setOnClickListener {
-            val fromLoc = etFrom.text.toString().trim()
-            val toLoc = etTo.text.toString().trim()
+        btnHomeFindBus.setOnClickListener {
+            val fromLoc = actvHomeOrigin.text.toString().trim()
+            val toLoc = actvHomeDestination.text.toString().trim()
             if (fromLoc.isEmpty() || toLoc.isEmpty()) {
                 Toast.makeText(this, "Please enter origin and destination.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -112,15 +117,17 @@ class HomeActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        btnSwap.setOnClickListener {
-            val temp = etFrom.text.toString()
-            etFrom.setText(etTo.text.toString())
-            etTo.setText(temp)
-            updateDestinationSuggestions(etFrom.text.toString())
+        
+        btnHomeSwapLocations.setOnClickListener {
+            val temp = actvHomeOrigin.text.toString()
+            actvHomeOrigin.setText(actvHomeDestination.text.toString())
+            actvHomeDestination.setText(temp)
+            updateDestinationSuggestions(actvHomeOrigin.text.toString())
         }
-        btnToday.setOnClickListener { selectDateOption("TODAY") }
-        btnTomorrow.setOnClickListener { selectDateOption("TOMORROW") }
-        btnOtherDate.setOnClickListener { showDatePicker() }
+        
+        btnHomeDateToday.setOnClickListener { selectDateOption("TODAY") }
+        btnHomeDateTomorrow.setOnClickListener { selectDateOption("TOMORROW") }
+        btnHomeDateOther.setOnClickListener { showDatePicker() }
     }
 
     private fun showDatePicker() {
@@ -132,8 +139,8 @@ class HomeActivity : AppCompatActivity() {
             val formattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
             selectedDateStr = formattedDate
             resetDateButtonsUI()
-            btnOtherDate.setBackgroundResource(R.drawable.bg_date_btn_selected)
-            tvOtherDateText.text = "$selectedDay/${selectedMonth + 1}"
+            btnHomeDateOther.setBackgroundResource(R.drawable.bg_date_btn_selected)
+            tvHomeDateOtherText.text = "$selectedDay/${selectedMonth + 1}"
         }, year, month, day)
         datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
         datePickerDialog.show()
@@ -146,21 +153,21 @@ class HomeActivity : AppCompatActivity() {
         when (option) {
             "TODAY" -> {
                 selectedDateStr = sdf.format(calendar.time)
-                btnToday.setBackgroundResource(R.drawable.bg_date_btn_selected)
+                btnHomeDateToday.setBackgroundResource(R.drawable.bg_date_btn_selected)
             }
             "TOMORROW" -> {
                 calendar.add(Calendar.DAY_OF_YEAR, 1)
                 selectedDateStr = sdf.format(calendar.time)
-                btnTomorrow.setBackgroundResource(R.drawable.bg_date_btn_selected)
+                btnHomeDateTomorrow.setBackgroundResource(R.drawable.bg_date_btn_selected)
             }
         }
     }
 
     private fun resetDateButtonsUI() {
-        btnToday.setBackgroundResource(R.drawable.bg_date_btn_unselected)
-        btnTomorrow.setBackgroundResource(R.drawable.bg_date_btn_unselected)
-        btnOtherDate.setBackgroundResource(R.drawable.bg_date_btn_unselected)
-        tvOtherDateText.text = "Other"
+        btnHomeDateToday.setBackgroundResource(R.drawable.bg_date_btn_unselected)
+        btnHomeDateTomorrow.setBackgroundResource(R.drawable.bg_date_btn_unselected)
+        btnHomeDateOther.setBackgroundResource(R.drawable.bg_date_btn_unselected)
+        tvHomeDateOtherText.text = "Other"
     }
 
     private fun loadLocationSuggestions() = lifecycleScope.launch {
@@ -170,9 +177,11 @@ class HomeActivity : AppCompatActivity() {
             routePairs = pairs
             allOrigins = pairs.map { it.first }.distinct().sorted()
             allDestinations = pairs.map { it.second }.distinct().sorted()
-            setupAutoComplete(etFrom, allOrigins)
-            setupAutoComplete(etTo, allDestinations)
-            etFrom.setOnItemClickListener { _, _, _, _ -> updateDestinationSuggestions(etFrom.text.toString()) }
+            
+            setupAutoComplete(actvHomeOrigin, allOrigins)
+            setupAutoComplete(actvHomeDestination, allDestinations)
+            
+            actvHomeOrigin.setOnItemClickListener { _, _, _, _ -> updateDestinationSuggestions(actvHomeOrigin.text.toString()) }
         } catch (e: Exception) { Log.e("Home", "Error suggestions: ${e.message}") }
     }
 
@@ -189,7 +198,7 @@ class HomeActivity : AppCompatActivity() {
             routePairs.filter { it.first.equals(origin, ignoreCase = true) }
                 .map { it.second }.distinct().sorted().ifEmpty { allDestinations }
         }
-        etTo.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, dests))
+        actvHomeDestination.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, dests))
     }
 
     private fun parseRouteName(routeNameRaw: String): Pair<String, String>? {
@@ -229,14 +238,15 @@ class HomeActivity : AppCompatActivity() {
         try {
             val userProfile = withContext(Dispatchers.IO) { try { authService.getProfileByAuthId(userId) } catch (e: Exception) { null } }
             val name = userProfile?.fullName ?: SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
-            tvUserName.text = "Hello $name!"
+            tvHomeUserName.text = "Hello $name!"
         } catch (e: Exception) { Log.e("Home", "Error profile: ${e.message}") }
 
         try {
             val bookings = withContext(Dispatchers.IO) { bookingsService.getBookingsByUserId(userId) }
+            
             if (bookings.isEmpty()) {
-                rvBookings.visibility = View.GONE
-                tvNoUpcoming.visibility = View.VISIBLE
+                rvHomeBookingHistory.visibility = View.GONE
+                tvHomeNoHistory.visibility = View.VISIBLE
                 return@launch
             }
             val uiList = mutableListOf<BookingItem>()
@@ -259,6 +269,7 @@ class HomeActivity : AppCompatActivity() {
                         val (formattedTimeLine, formattedDateLine) = formatDateTimeForDisplay(dateTimeSource)
 
                         uiList.add(BookingItem(
+                            bookingId = booking.id,
                             index = index + 1,
                             fromLoc = pair?.first ?: "Start",
                             toLoc = pair?.second ?: "End",
@@ -269,12 +280,17 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
             if (uiList.isEmpty()) {
-                tvNoUpcoming.visibility = View.VISIBLE
-                rvBookings.visibility = View.GONE
+                tvHomeNoHistory.visibility = View.VISIBLE
+                rvHomeBookingHistory.visibility = View.GONE
             } else {
-                tvNoUpcoming.visibility = View.GONE
-                rvBookings.visibility = View.VISIBLE
-                rvBookings.adapter = BookingsAdapter(uiList)
+                tvHomeNoHistory.visibility = View.GONE
+                rvHomeBookingHistory.visibility = View.VISIBLE
+                
+                rvHomeBookingHistory.adapter = BookingsAdapter(uiList) { bookingId ->
+                    val intent = Intent(this@HomeActivity, TicketDetailActivity::class.java)
+                    intent.putExtra("BOOKING_ID", bookingId)
+                    startActivity(intent)
+                }
             }
         } catch (e: Exception) { Log.e("Home", "Error bookings: ${e.message}") }
     }

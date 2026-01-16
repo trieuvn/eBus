@@ -40,19 +40,36 @@ class TripsAdapter(
         val start = formatTime(trip.departureTime)
         val end = formatTime(trip.arrivalTime)
 
+        // Dòng thời gian nằm đúng chỗ (không còn hiện 2025-)
         holder.tvStartTime.text = "$start  —  $end"
-        holder.tvEndTime.text = "" // đang GONE nên không quan trọng
+        holder.tvEndTime.text = "" // tvEndTime đang GONE trong layout
+
+        // Bạn có thể thay bằng tính phút nếu muốn; hiện tại giữ "Direct" như cũ
         holder.tvDuration.text = "Direct"
 
-        holder.itemView.setOnClickListener {
-            onTripClick(trip)
-        }
+        holder.itemView.setOnClickListener { onTripClick(trip) }
     }
 
     override fun getItemCount(): Int = tripList.size
 
-    private fun formatTime(time: String?): String {
-        if (time.isNullOrEmpty()) return "--:--"
-        return if (time.length >= 5) time.substring(0, 5) else time
+    /**
+     * Fix lỗi DB trả về dạng "2025-01-16 09:00:00" hoặc "2025-01-16T09:00:00"
+     * mà code cũ substring(0,5) => "2025-"
+     */
+    private fun formatTime(raw: String?): String {
+        if (raw.isNullOrBlank()) return "--:--"
+
+        val candidate = when {
+            raw.contains("T") -> raw.substringAfter("T")   // ISO: 2025-01-16T09:00:00
+            raw.contains(" ") -> raw.substringAfter(" ")   // SQL: 2025-01-16 09:00:00
+            else -> raw                                     // 09:00:00 hoặc 09:00
+        }.trim()
+
+        // Lấy HH:mm
+        return if (candidate.length >= 5 && candidate[2] == ':') {
+            candidate.substring(0, 5)
+        } else {
+            "--:--"
+        }
     }
 }

@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 data class BookingItem(
+    val bookingId: Long,
     val index: Int,
     val fromLoc: String,
     val toLoc: String,
@@ -14,13 +15,17 @@ data class BookingItem(
     val fullDate: String
 )
 
-class BookingsAdapter(private val list: List<BookingItem>) : RecyclerView.Adapter<BookingsAdapter.BookingViewHolder>() {
+class BookingsAdapter(
+    private val list: List<BookingItem>,
+    private val onItemClick: (Long) -> Unit
+) : RecyclerView.Adapter<BookingsAdapter.BookingViewHolder>() {
+
     class BookingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvIndex: TextView = itemView.findViewById(R.id.tvIndex)
-        val tvFrom: TextView = itemView.findViewById(R.id.tvFrom)
-        val tvTo: TextView = itemView.findViewById(R.id.tvTo)
-        val tvTime: TextView = itemView.findViewById(R.id.tvTime)
-        val tvDate: TextView = itemView.findViewById(R.id.tvDate)
+        val tvHistoryIndex: TextView = itemView.findViewById(R.id.tvHistoryIndex)
+        val tvHistoryOrigin: TextView = itemView.findViewById(R.id.tvHistoryOrigin)
+        val tvHistoryDestination: TextView = itemView.findViewById(R.id.tvHistoryDestination)
+        val tvHistoryTime: TextView = itemView.findViewById(R.id.tvHistoryTime)
+        val tvHistoryDate: TextView = itemView.findViewById(R.id.tvHistoryDate)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookingViewHolder {
@@ -30,11 +35,15 @@ class BookingsAdapter(private val list: List<BookingItem>) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: BookingViewHolder, position: Int) {
         val item = list[position]
-        holder.tvIndex.text = item.index.toString()
-        holder.tvFrom.text = "From: ${item.fromLoc}"
-        holder.tvTo.text = "To: ${item.toLoc}"
-        holder.tvTime.text = item.timeAndDay
-        holder.tvDate.text = item.fullDate
+        holder.tvHistoryIndex.text = item.index.toString()
+        holder.tvHistoryOrigin.text = "From: ${item.fromLoc}"
+        holder.tvHistoryDestination.text = "To: ${item.toLoc}"
+        holder.tvHistoryTime.text = item.timeAndDay
+        holder.tvHistoryDate.text = item.fullDate
+
+        holder.itemView.setOnClickListener {
+            onItemClick(item.bookingId)
+        }
     }
 
     override fun getItemCount(): Int = list.size
