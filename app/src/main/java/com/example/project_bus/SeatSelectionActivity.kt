@@ -8,10 +8,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project_bus.data.SupabaseProvider
+import com.example.project_bus.data.services.BookingPassengersService
+import com.example.project_bus.data.services.BookingsService
 import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SeatSelectionActivity : AppCompatActivity() {
 
@@ -19,13 +25,11 @@ class SeatSelectionActivity : AppCompatActivity() {
     private lateinit var btnConfirmSeat: Button
     private lateinit var adapter: SeatAdapter
     
-    // Nút chuyển tầng
     private lateinit var btnLowerDeck: TextView
     private lateinit var btnUpperDeck: TextView
     
-    private var currentDeck = "LOWER" // Trạng thái hiện tại
+    private var currentDeck = "LOWER" 
 
-    // Danh sách ghế riêng cho 2 tầng
     private val seatListLower = ArrayList<Seat>()
     private val seatListUpper = ArrayList<Seat>()
     
@@ -38,6 +42,10 @@ class SeatSelectionActivity : AppCompatActivity() {
     private var fromLoc: String = ""
     private var toLoc: String = ""
     private var dateStr: String = ""
+
+    // Services
+    private val bookingsService = BookingsService()
+    private val passengersService = BookingPassengersService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,12 +76,12 @@ class SeatSelectionActivity : AppCompatActivity() {
         
         findViewById<CardView>(R.id.btnBack).setOnClickListener { finish() }
 
-        initSeatData()
+        // 1. Tạo ghế trống trước
+        initEmptySeats()
 
-        // Mặc định load tầng dưới
+        // 2. Setup RecyclerView
         setupRecyclerView("LOWER")
         
-        // Sự kiện chuyển tầng
         btnLowerDeck.setOnClickListener { switchDeck("LOWER") }
         btnUpperDeck.setOnClickListener { switchDeck("UPPER") }
 
@@ -93,13 +101,50 @@ class SeatSelectionActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+        // 3. Tải ghế đã đặt từ DB
+        loadBookedSeats()
+    }
+
+    private fun loadBookedSeats() = lifecycleScope.launch {
+        try {
+            // Lấy tất cả booking của chuyến này (chỉ lấy vé Confirmed = 1)
+            val bookings = withContext(Dispatchers.IO) { 
+                bookingsService.getBookingsByTripId(tripId).filter { it.bookingStatus == 1 }
+            }
+            val bookingIds = bookings.map { it.id }
+
+            if (bookingIds.isNotEmpty()) {
+                // Lấy tất cả hành khách của các booking đó -> ra số ghế
+                val passengers = withContext(Dispatchers.IO) {
+                    passengersService.getPassengersByBookingIds(bookingIds)
+                }
+                val bookedSeatNumbers = passengers.mapNotNull { it.seatNumber }
+
+                // Cập nhật trạng thái ghế
+                updateListStatus(seatListLower, bookedSeatNumbers)
+                updateListStatus(seatListUpper, bookedSeatNumbers)
+                
+                adapter.notifyDataSetChanged()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this@SeatSelectionActivity, "Error loading seats: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateListStatus(list: ArrayList<Seat>, bookedNumbers: List<String>) {
+        for (seat in list) {
+            if (bookedNumbers.contains(seat.id)) {
+                seat.status = 1 // Booked
+            }
+        }
     }
 
     private fun switchDeck(deck: String) {
         if (currentDeck == deck) return
         currentDeck = deck
         
-        // Đổi màu nút để biết đang chọn tầng nào
         if (deck == "LOWER") {
             btnLowerDeck.setBackgroundResource(R.drawable.bg_outline_red)
             btnLowerDeck.setTextColor(ContextCompat.getColor(this, R.color.brand_red))
@@ -111,7 +156,6 @@ class SeatSelectionActivity : AppCompatActivity() {
             btnLowerDeck.setBackgroundResource(R.drawable.bg_date_button)
             btnLowerDeck.setTextColor(ContextCompat.getColor(this, R.color.dot_gray))
         }
-        
         setupRecyclerView(deck)
     }
 
@@ -124,8 +168,8 @@ class SeatSelectionActivity : AppCompatActivity() {
         rvSeats.adapter = adapter
     }
 
-    private fun initSeatData() {
-        // Tầng dưới: L1 -> L20
+    private fun initEmptySeats() {
+        // Tầng dưới: L1 -> L20 (Mặc định status = 0 Available)
         var seatNum = 1
         for (row in 1..5) {
             for (col in 0..4) {
@@ -133,8 +177,7 @@ class SeatSelectionActivity : AppCompatActivity() {
                     seatListLower.add(Seat("AISLE_L_$row", -1))
                 } else {
                     val id = "L$seatNum"
-                    val isBooked = Math.random() < 0.2
-                    seatListLower.add(Seat(id, if(isBooked) 1 else 0))
+                    seatListLower.add(Seat(id, 0)) // Available
                     seatNum++
                 }
             }
@@ -148,8 +191,7 @@ class SeatSelectionActivity : AppCompatActivity() {
                     seatListUpper.add(Seat("AISLE_U_$row", -1))
                 } else {
                     val id = "U$seatNum"
-                    val isBooked = Math.random() < 0.2
-                    seatListUpper.add(Seat(id, if(isBooked) 1 else 0))
+                    seatListUpper.add(Seat(id, 0)) // Available
                     seatNum++
                 }
             }
@@ -158,6 +200,10 @@ class SeatSelectionActivity : AppCompatActivity() {
 
     private fun toggleSeat(seat: Seat) {
         if (seat.status == 0) {
+            if (selectedSeats.size >= 5) {
+                Toast.makeText(this, "Max 5 seats allowed", Toast.LENGTH_SHORT).show()
+                return
+            }
             seat.status = 2
             selectedSeats.add(seat.id)
         } else if (seat.status == 2) {

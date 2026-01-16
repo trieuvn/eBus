@@ -20,8 +20,14 @@ class BookingsService {
             }
             .decodeList()
 
-    suspend fun getAllBookings(): List<Booking> =
-        client.from(Tables.BOOKINGS).select().decodeList()
+    suspend fun getBookingsByTripId(tripId: Long): List<Booking> =
+        client.from(Tables.BOOKINGS)
+            .select {
+                filter {
+                    eq("trip_id", tripId)
+                }
+            }
+            .decodeList()
 
     suspend fun getBookingById(id: Long): Booking? =
         client.from(Tables.BOOKINGS)
@@ -29,9 +35,10 @@ class BookingsService {
             .decodeList<Booking>()
             .firstOrNull()
 
+    // Hàm quan trọng để tạo Booking và trả về ID
     suspend fun createBooking(booking: BookingCreate): Booking =
         client.from(Tables.BOOKINGS)
-            .insert(booking) { select() }
+            .insert(booking) { select() } // select() là bắt buộc để trả về dữ liệu
             .decodeSingle()
 
     suspend fun updateBooking(id: Long, update: BookingUpdate): Booking =
