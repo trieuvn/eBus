@@ -3,110 +3,154 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    android:layout_marginHorizontal="16dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:contentPadding="16dp">
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingStart="14dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="10dp">
 
+        <!-- LEFT: Bus name -->
         <TextView
-            android:id="@+id/tvBusName"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvOperatorName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Perera Travels"
-            android:textColor="#333"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:textColor="#7A7A7A"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toStartOf="@+id/rightColumn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- LEFT: Bus type -->
         <TextView
             android:id="@+id/tvBusType"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="A/C Sleeper (2+2)"
-            android:textColor="#777"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvBusName" />
+            android:textColor="#A0A0A0"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@id/tvOperatorName"
+            app:layout_constraintStart_toStartOf="@id/tvOperatorName"
+            app:layout_constraintTop_toBottomOf="@id/tvOperatorName" />
 
+        <!-- LEFT: Time range -->
         <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvStartTime"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="LKR 200"
-            android:textColor="#FF9800"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginTop="6dp"
+            android:text="9:00 AM  —  9:45 AM"
+            android:textColor="#6A6A6A"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/tvOperatorName"
+            app:layout_constraintStart_toStartOf="@id/tvOperatorName"
+            app:layout_constraintTop_toBottomOf="@id/tvBusType" />
 
+        <!-- Keep tvEndTime for adapter compatibility, but hide -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="45 Min"
-            android:textColor="#000"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvPrice" />
+            android:id="@+id/tvEndTime"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
+        <!-- LEFT: Seats left -->
         <TextView
-            android:id="@+id/tvTime"
+            android:id="@+id/tvSeatsAvailable"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="09:00 AM - 09:45 AM"
-            android:textColor="#000"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvBusType" />
-
-        <TextView
-            android:id="@+id/tvSeatsLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:text="15 Seats left"
             android:textColor="#4CAF50"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTime" />
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/tvOperatorName"
+            app:layout_constraintTop_toBottomOf="@id/tvStartTime"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- RIGHT COLUMN: price + duration -->
         <LinearLayout
+            android:id="@+id/rightColumn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvTripPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LKR 200"
+                android:textColor="#FF9800"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="45 Min"
+                android:textColor="#222222"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Bottom-right icons -->
+        <LinearLayout
+            android:id="@+id/actionsRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@id/tvSeatsLeft"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_notification"
-                app:tint="#999" />
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_settings"
-                app:tint="#999" />
-        </LinearLayout>
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/ic_trip_target"
+                app:tint="#A9A9A9" />
 
-        <Button
-            android:id="@+id/btnBookNow"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/ic_trip_ticket"
+                app:tint="#A9A9A9" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/ic_trip_signal"
+                app:tint="#A9A9A9" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_trip_reply"
+                app:tint="#A9A9A9" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
