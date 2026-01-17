@@ -69,6 +69,15 @@ class PaymentActivity : AppCompatActivity() {
 
             val btnPayNow = findViewById<View>(R.id.btnPayNow)
             btnPayNow.setOnClickListener { processPayment(btnPayNow) }
+
+            // --- FIX: Home Icon Click ---
+            findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+                val intent = Intent(this, HomeActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+                finish()
+            }
+
         } catch (e: Exception) {
             Log.e("PaymentInit", "Error in onCreate", e)
             Toast.makeText(this, "Init Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -149,7 +158,6 @@ class PaymentActivity : AppCompatActivity() {
                     }
 
                     // 3) Create Payment record + mark booking PAID
-                    // CHANGED: Passed totalPrice directly as Double, removed .toInt()
                     paymentsService.createPayment(
                         PaymentCreate(
                             bookingId = createdBookingId,

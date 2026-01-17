@@ -78,6 +78,14 @@ class BoardingDropActivity : AppCompatActivity() {
         }
         
         findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
+
+        // --- FIX: Home Icon Click ---
+        findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun loadStopsForTrip(tripId: Long) = lifecycleScope.launch {

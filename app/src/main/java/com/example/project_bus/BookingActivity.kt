@@ -59,6 +59,14 @@ class BookingActivity : AppCompatActivity() {
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         tvHeaderName.text = "Hello $userEmail!"
 
+        // --- FIX: Home Icon Click ---
+        findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
+
         // Search
         searchTrips(fromLoc, toLoc, date)
     }
