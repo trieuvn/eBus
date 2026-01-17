@@ -97,7 +97,7 @@
                 android:id="@+id/tvTripPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LKR 200"
+                android:text="200 VNĐ"
                 android:textColor="#FF9800"
                 android:textSize="22sp"
                 android:textStyle="bold" />

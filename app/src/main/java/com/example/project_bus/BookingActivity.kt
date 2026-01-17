@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.project_bus.data.SupabaseProvider
 import com.example.project_bus.data.services.RoutesService
 import com.example.project_bus.data.services.TripsService
-import com.example.project_bus.data.models.Trip // QUAN TRỌNG: models có s
 import com.example.project_bus.ui.adapters.TripsAdapter
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class BookingActivity : AppCompatActivity() {
 
@@ -60,6 +62,14 @@ class BookingActivity : AppCompatActivity() {
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         tvHeaderName.text = "Hello $userEmail!"
 
+        // --- FIX: Home Icon Click ---
+        findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
+
         // Search
         searchTrips(fromLoc, toLoc, date)
     }
@@ -67,11 +77,17 @@ class BookingActivity : AppCompatActivity() {
     private fun searchTrips(from: String, to: String, dateStr: String) = lifecycleScope.launch {
         Log.d("Booking", "Searching for $from -> $to")
 
+        // --- HIỂN THỊ CẢNH BÁO TĂNG GIÁ ---
+        if (isWeekend(dateStr)) {
+            Toast.makeText(this@BookingActivity, "Lưu ý: Giá vé tăng 10% vào ngày cuối tuần (T7, CN)!", Toast.LENGTH_LONG).show()
+        }
+        // -----------------------------------
+
         try {
             val allRoutes = withContext(Dispatchers.IO) { routesService.getAllRoutes() }
 
             val matchedRoute = allRoutes.find { route ->
-                val name = route.name.orEmpty().lowercase()
+                val name = route.name.lowercase()
                 name.contains(from.lowercase()) && name.contains(to.lowercase())
             }
 
@@ -80,7 +96,6 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // Dữ liệu này trả về List<models.Trip>
             val allTrips = withContext(Dispatchers.IO) { tripsService.getAllTrips() }
 
             val filteredTrips = allTrips.filter { it.routeId == matchedRoute.id && it.status == 1 }
@@ -91,11 +106,11 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // Adapter bây giờ nhận List<models.Trip>, khớp hoàn toàn
-            rvTrips.adapter = TripsAdapter(filteredTrips) { trip -> 
+            // Truyền dateStr vào Adapter để hiển thị giá đã tăng
+            rvTrips.adapter = TripsAdapter(filteredTrips, dateStr) { trip -> 
                 val intent = Intent(this@BookingActivity, SeatSelectionActivity::class.java)
                 intent.putExtra("TRIP_ID", trip.id)
-                intent.putExtra("PRICE", trip.price)
+                intent.putExtra("PRICE", trip.price) 
                 intent.putExtra("OPERATOR", trip.operatorName)
                 intent.putExtra("BUS_TYPE", trip.busType)
                 intent.putExtra("FROM_LOC", from)
@@ -107,6 +122,19 @@ class BookingActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("BookingActivity", "searchTrips failed", e)
             Toast.makeText(this@BookingActivity, "Search failed. Please try again.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isWeekend(date: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val d = sdf.parse(date) ?: return false
+            val cal = Calendar.getInstance()
+            cal.time = d
+            val day = cal.get(Calendar.DAY_OF_WEEK)
+            day == Calendar.SATURDAY || day == Calendar.SUNDAY
+        } catch (e: Exception) {
+            false
         }
     }
 }

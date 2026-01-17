@@ -15,6 +15,7 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class BoardingDropActivity : AppCompatActivity() {
 
@@ -25,7 +26,6 @@ class BoardingDropActivity : AppCompatActivity() {
     private lateinit var tvSelectedDrop: TextView
     private var selectedBoardingId: Int = -1
     private var selectedDropId: Int = -1
-    
     private var availableStops = listOf<RouteStop>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,17 +37,18 @@ class BoardingDropActivity : AppCompatActivity() {
         val toLoc = intent.getStringExtra("TO_LOC") ?: ""
         val totalPrice = intent.getDoubleExtra("TOTAL_PRICE", 0.0)
         
-        // Setup UI Header
         findViewById<TextView>(R.id.tvHeaderFrom).text = fromLoc
         findViewById<TextView>(R.id.tvHeaderTo).text = toLoc
-        findViewById<TextView>(R.id.tvTotalFare).text = "LKR ${totalPrice.toInt()}"
+        
+        val totalStr = if (totalPrice % 1.0 == 0.0) "%.0f".format(Locale.US, totalPrice) else "%.2f".format(Locale.US, totalPrice)
+        findViewById<TextView>(R.id.tvTotalFare).text = "LKR $totalStr"
+        
         val user = SupabaseProvider.client.auth.currentUserOrNull()
         findViewById<TextView>(R.id.tvHeaderUser).text = "Hello ${user?.email}!"
 
         tvSelectedBoarding = findViewById(R.id.tvSelectedBoarding)
         tvSelectedDrop = findViewById(R.id.tvSelectedDrop)
         
-        // Load stops logic
         loadStopsForTrip(tripId)
 
         findViewById<android.view.View>(R.id.layoutBoarding).setOnClickListener {
@@ -77,6 +78,14 @@ class BoardingDropActivity : AppCompatActivity() {
         }
         
         findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
+
+        // --- FIX: Home Icon Click ---
+        findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun loadStopsForTrip(tripId: Long) = lifecycleScope.launch {

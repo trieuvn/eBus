@@ -11,9 +11,7 @@ import io.github.jan.supabase.auth.handleDeeplinks
 
 /**
  * Receives Supabase Auth deeplinks (signup confirmation, OTP, OAuth).
- *
- * Deeplink pattern in Supabase Dashboard must match: scheme://host
- * Example used here: com.example.project_bus://login
+ * Example used here: com.example.project_bus://login-callback
  */
 class AuthCallbackActivity : AppCompatActivity() {
 
@@ -22,8 +20,6 @@ class AuthCallbackActivity : AppCompatActivity() {
         handleAuthIntent(intent)
     }
 
-    // Fix for the compile error:
-    // - override signature must be (intent: Intent) not (intent: Intent?)
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -32,10 +28,9 @@ class AuthCallbackActivity : AppCompatActivity() {
 
     private fun handleAuthIntent(intent: Intent) {
         try {
-            // Parse the session/token from the deeplink and import it into the Auth plugin
             SupabaseProvider.client.handleDeeplinks(intent)
         } catch (e: Exception) {
-            // If it's not a Supabase deeplink or parsing fails, we still continue to Login screen
+            // Ignore if parsing fails
         }
 
         val isSignedIn = SupabaseProvider.client.auth.currentUserOrNull() != null

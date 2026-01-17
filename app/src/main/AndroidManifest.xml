@@ -26,8 +26,11 @@
         <activity
             android:name=".ui.auth.SignupSuccessActivity"
             android:exported="false" />
+            
+        <activity
+            android:name=".ui.auth.VerifyOtpActivity"
+            android:exported="false" />
 
-        <!-- Callback deeplink cho OAuth (Google) + email/OTP link verification. -->
         <activity
             android:name=".ui.auth.AuthCallbackActivity"
             android:exported="true"
@@ -37,7 +40,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- Phải khớp với SupabaseProvider: scheme = applicationId, host = login-callback -->
                 <data
                     android:scheme="${applicationId}"
                     android:host="login-callback" />
@@ -67,8 +69,9 @@
         <activity android:name=".GuestDetailsActivity" />
         <activity android:name=".PaymentActivity" />
         <activity android:name=".PaymentSuccessActivity" />
+        
+        <activity android:name=".TicketDetailActivity" />
 
     </application>
 
 </manifest>
-

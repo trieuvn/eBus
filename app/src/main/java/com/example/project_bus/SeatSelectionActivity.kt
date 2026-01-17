@@ -18,6 +18,9 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class SeatSelectionActivity : AppCompatActivity() {
 
@@ -43,7 +46,6 @@ class SeatSelectionActivity : AppCompatActivity() {
     private var toLoc: String = ""
     private var dateStr: String = ""
 
-    // Services
     private val bookingsService = BookingsService()
     private val passengersService = BookingPassengersService()
 
@@ -52,19 +54,37 @@ class SeatSelectionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_seat_selection)
 
         tripId = intent.getLongExtra("TRIP_ID", -1)
-        ticketPrice = intent.getDoubleExtra("PRICE", 0.0)
+        var basePrice = intent.getDoubleExtra("PRICE", 0.0)
         operatorName = intent.getStringExtra("OPERATOR") ?: "Unknown"
         busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
         fromLoc = intent.getStringExtra("FROM_LOC") ?: "Start"
         toLoc = intent.getStringExtra("TO_LOC") ?: "End"
         dateStr = intent.getStringExtra("DATE") ?: "Date"
 
+        // --- LOGIC TĂNG GIÁ ---
+        val isWeekend = isWeekend(dateStr)
+        ticketPrice = if (isWeekend) basePrice * 1.1 else basePrice
+        // ----------------------
+
+        if (isWeekend) {
+            Toast.makeText(this, "Cuối tuần: Giá vé đã tăng 10%", Toast.LENGTH_LONG).show()
+        }
+
         findViewById<TextView>(R.id.tvRouteFrom).text = fromLoc
         findViewById<TextView>(R.id.tvRouteTo).text = toLoc
         findViewById<TextView>(R.id.tvRouteDate).text = dateStr
         findViewById<TextView>(R.id.tvOperator).text = operatorName
         findViewById<TextView>(R.id.tvBusType).text = busType
-        findViewById<TextView>(R.id.tvTicketPrice).text = "LKR ${ticketPrice.toInt()}"
+        
+        val priceStr = if (ticketPrice % 1.0 == 0.0) "%.0f".format(Locale.US, ticketPrice) else "%.2f".format(Locale.US, ticketPrice)
+        val tvPrice = findViewById<TextView>(R.id.tvTicketPrice)
+        
+        if (isWeekend) {
+            tvPrice.text = "LKR $priceStr (+10%)"
+            tvPrice.setTextColor(android.graphics.Color.parseColor("#D50000"))
+        } else {
+            tvPrice.text = "LKR $priceStr"
+        }
 
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         findViewById<TextView>(R.id.tvHeaderName).text = "Hello $userEmail!"
@@ -76,10 +96,15 @@ class SeatSelectionActivity : AppCompatActivity() {
         
         findViewById<CardView>(R.id.btnBack).setOnClickListener { finish() }
 
-        // 1. Tạo ghế trống trước
-        initEmptySeats()
+        // --- FIX: Home Icon Click ---
+        findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
 
-        // 2. Setup RecyclerView
+        initEmptySeats()
         setupRecyclerView("LOWER")
         
         btnLowerDeck.setOnClickListener { switchDeck("LOWER") }
@@ -102,26 +127,22 @@ class SeatSelectionActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Tải ghế đã đặt từ DB
         loadBookedSeats()
     }
 
     private fun loadBookedSeats() = lifecycleScope.launch {
         try {
-            // Lấy tất cả booking của chuyến này (chỉ lấy vé Confirmed = 1)
             val bookings = withContext(Dispatchers.IO) { 
                 bookingsService.getBookingsByTripId(tripId).filter { it.bookingStatus == 1 }
             }
             val bookingIds = bookings.map { it.id }
 
             if (bookingIds.isNotEmpty()) {
-                // Lấy tất cả hành khách của các booking đó -> ra số ghế
                 val passengers = withContext(Dispatchers.IO) {
                     passengersService.getPassengersByBookingIds(bookingIds)
                 }
                 val bookedSeatNumbers = passengers.mapNotNull { it.seatNumber }
 
-                // Cập nhật trạng thái ghế
                 updateListStatus(seatListLower, bookedSeatNumbers)
                 updateListStatus(seatListUpper, bookedSeatNumbers)
                 
@@ -136,7 +157,7 @@ class SeatSelectionActivity : AppCompatActivity() {
     private fun updateListStatus(list: ArrayList<Seat>, bookedNumbers: List<String>) {
         for (seat in list) {
             if (bookedNumbers.contains(seat.id)) {
-                seat.status = 1 // Booked
+                seat.status = 1 
             }
         }
     }
@@ -169,7 +190,6 @@ class SeatSelectionActivity : AppCompatActivity() {
     }
 
     private fun initEmptySeats() {
-        // Tầng dưới: L1 -> L20 (Mặc định status = 0 Available)
         var seatNum = 1
         for (row in 1..5) {
             for (col in 0..4) {
@@ -177,13 +197,12 @@ class SeatSelectionActivity : AppCompatActivity() {
                     seatListLower.add(Seat("AISLE_L_$row", -1))
                 } else {
                     val id = "L$seatNum"
-                    seatListLower.add(Seat(id, 0)) // Available
+                    seatListLower.add(Seat(id, 0)) 
                     seatNum++
                 }
             }
         }
         
-        // Tầng trên: U1 -> U20
         seatNum = 1
         for (row in 1..5) {
             for (col in 0..4) {
@@ -191,7 +210,7 @@ class SeatSelectionActivity : AppCompatActivity() {
                     seatListUpper.add(Seat("AISLE_U_$row", -1))
                 } else {
                     val id = "U$seatNum"
-                    seatListUpper.add(Seat(id, 0)) // Available
+                    seatListUpper.add(Seat(id, 0))
                     seatNum++
                 }
             }
@@ -217,7 +236,21 @@ class SeatSelectionActivity : AppCompatActivity() {
             btnConfirmSeat.text = "Select a seat"
         } else {
             val s = selectedSeats.joinToString(",")
-            btnConfirmSeat.text = "Book $s (LKR ${total.toInt()})"
+            val totalStr = if (total % 1.0 == 0.0) "%.0f".format(Locale.US, total) else "%.2f".format(Locale.US, total)
+            btnConfirmSeat.text = "Book $s (LKR $totalStr)"
+        }
+    }
+
+    private fun isWeekend(date: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val d = sdf.parse(date) ?: return false
+            val cal = Calendar.getInstance()
+            cal.time = d
+            val day = cal.get(Calendar.DAY_OF_WEEK)
+            day == Calendar.SATURDAY || day == Calendar.SUNDAY
+        } catch (e: Exception) {
+            false
         }
     }
 }

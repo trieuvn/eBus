@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Payment(
     @SerialName("id")
-    val id: String,
+    val id: Long,
 
     @SerialName("booking_id")
     val bookingId: Long,
@@ -15,7 +15,7 @@ data class Payment(
     val transactionRef: String? = null,
 
     @SerialName("amount")
-    val amount: Int? = null,
+    val amount: Double? = null, // CHANGED: Int -> Double to support decimals
 
     @SerialName("payment_method")
     val paymentMethod: String? = null,
@@ -36,7 +36,7 @@ data class PaymentCreate(
     val transactionRef: String? = null,
 
     @SerialName("amount")
-    val amount: Int? = null,
+    val amount: Double? = null, // CHANGED: Int -> Double
 
     @SerialName("payment_method")
     val paymentMethod: String? = null,
@@ -51,7 +51,7 @@ data class PaymentUpdate(
     val transactionRef: String? = null,
 
     @SerialName("amount")
-    val amount: Int? = null,
+    val amount: Double? = null, // CHANGED: Int -> Double
 
     @SerialName("payment_method")
     val paymentMethod: String? = null,
@@ -59,5 +59,3 @@ data class PaymentUpdate(
     @SerialName("payment_status")
     val paymentStatus: Int? = null
 )
-
-

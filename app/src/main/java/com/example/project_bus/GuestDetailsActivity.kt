@@ -24,14 +24,13 @@ class GuestDetailsActivity : AppCompatActivity() {
         val operator = intent.getStringExtra("OPERATOR") ?: "Bus"
         val busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
         val seats = intent.getStringArrayListExtra("SELECTED_SEATS") ?: arrayListOf()
-        // val total = intent.getDoubleExtra("TOTAL_PRICE", 0.0) // Không cần dùng ở đây
+        val total = intent.getDoubleExtra("TOTAL_PRICE", 10000.0)
 
         findViewById<TextView>(R.id.tvBusName).text = operator
         findViewById<TextView>(R.id.tvBusType).text = busType
 
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         findViewById<TextView>(R.id.tvHeaderUser).text = "Hello $userEmail!"
-
         findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
 
         containerPassengers = findViewById(R.id.containerPassengers)
@@ -50,19 +49,26 @@ class GuestDetailsActivity : AppCompatActivity() {
                 val passengerNames = passengerInputViews.map { it.etName.text.toString().trim() }
 
                 // Lấy tên người liên hệ (Mặc định là người đầu tiên nếu không nhập gì khác)
-                // Vì layout không có ô Contact Name, ta lấy tên hành khách đầu tiên làm đại diện
                 val contactName = passengerNames.firstOrNull() ?: "Unknown"
 
                 val nextIntent = Intent(this, PaymentActivity::class.java)
                 nextIntent.putExtras(intent) // Truyền tiếp các dữ liệu cũ (TripID, Seats, Price...)
 
-                nextIntent.putExtra("CONTACT_NAME", contactName) // Thêm dòng này
+                nextIntent.putExtra("CONTACT_NAME", contactName) 
                 nextIntent.putExtra("CONTACT_MOBILE", contactMobile)
                 nextIntent.putExtra("CONTACT_EMAIL", contactEmail)
                 nextIntent.putStringArrayListExtra("PASSENGER_NAMES", ArrayList(passengerNames))
 
                 startActivity(nextIntent)
             }
+        }
+
+        // --- FIX: Home Icon Click ---
+        findViewById<android.view.View>(R.id.navHome).setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
         }
     }
 

@@ -67,7 +67,13 @@
                     android:layout_marginEnd="10dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_home" android:rotation="180" android:layout_gravity="center" app:tint="#333"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home"
+                        android:rotation="180"
+                        android:layout_gravity="center"
+                        app:tint="#333"/>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -75,7 +81,12 @@
                     android:layout_height="40dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_notification" android:layout_gravity="center" app:tint="#333"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_notification"
+                        android:layout_gravity="center"
+                        app:tint="#333"/>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
 
@@ -85,30 +96,121 @@
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
 
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#D50000" android:gravity="center" android:orientation="vertical" android:padding="16dp">
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="horizontal">
-                            <TextView android:id="@+id/tvRouteFrom" android:text="Kelaniya" android:textColor="#FFF" android:textSize="18sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                            <ImageView android:src="@drawable/ic_swap" app:tint="#FFF" android:layout_width="24dp" android:layout_height="24dp" android:layout_marginHorizontal="16dp" android:background="@drawable/bg_bottom_nav" android:backgroundTint="#33000000" android:padding="5dp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#D50000"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                            <TextView android:id="@+id/tvRouteTo" android:text="Colombo" android:textColor="#FFF" android:textSize="18sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/tvRouteFrom"
+                                android:text="Kelaniya"
+                                android:textColor="#FFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                            <ImageView
+                                android:src="@drawable/ic_swap"
+                                app:tint="#FFF"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:background="@drawable/bg_bottom_nav"
+                                android:backgroundTint="#33000000"
+                                android:padding="5dp"/>
+                            <TextView
+                                android:id="@+id/tvRouteTo"
+                                android:text="Colombo"
+                                android:textColor="#FFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
 
-                        <TextView android:id="@+id/tvRouteDate" android:layout_marginTop="12dp" android:background="@drawable/bg_input_field" android:backgroundTint="#B71C1C" android:paddingHorizontal="20dp" android:paddingVertical="6dp" android:text="08th - Dec - 2024" android:textColor="#FFF" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvRouteDate"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_input_field"
+                            android:backgroundTint="#B71C1C"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="6dp"
+                            android:text="08th - Dec - 2024"
+                            android:textColor="#FFF"
+                            android:textSize="12sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
                     </LinearLayout>
 
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FFF" android:padding="16dp">
-                        <TextView android:id="@+id/tvOperator" android:text="Perera Travels" android:textColor="#333" android:textSize="16sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFF"
+                        android:padding="16dp">
 
-                        <TextView android:id="@+id/tvTicketPrice" android:text="LKR 200" android:textColor="#FF9800" android:textSize="18sp" android:textStyle="bold" android:layout_alignParentEnd="true" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvOperator"
+                            android:text="Perera Travels"
+                            android:textColor="#333"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
 
-                        <TextView android:id="@+id/tvBusType" android:layout_below="@id/tvOperator" android:text="A/C Sleeper (2+2)" android:textColor="#777" android:textSize="12sp" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvTicketPrice"
+                            android:text="LKR 200"
+                            android:textColor="#FF9800"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:layout_alignParentEnd="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
 
-                        <TextView android:text="15 Seats left" android:textColor="#4CAF50" android:textSize="12sp" android:layout_below="@id/tvOperator" android:layout_marginTop="24dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                        <LinearLayout android:layout_alignParentEnd="true" android:layout_below="@id/tvOperator" android:layout_marginTop="24dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                            <ImageView android:src="@drawable/ic_settings" android:layout_width="16dp" android:layout_height="16dp" app:tint="#AAA"/>
+                        <TextView
+                            android:id="@+id/tvBusType"
+                            android:layout_below="@id/tvOperator"
+                            android:text="A/C Sleeper (2+2)"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:text="15 Seats left"
+                            android:textColor="#4CAF50"
+                            android:textSize="12sp"
+                            android:layout_below="@id/tvOperator"
+                            android:layout_marginTop="24dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <LinearLayout
+                            android:layout_alignParentEnd="true"
+                            android:layout_below="@id/tvOperator"
+                            android:layout_marginTop="24dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:src="@drawable/ic_settings"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                app:tint="#AAA"/>
                         </LinearLayout>
                     </RelativeLayout>
                 </LinearLayout>
@@ -119,6 +221,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:baselineAligned="false">
+
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -127,11 +230,13 @@
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
                         android:orientation="vertical">
+
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -139,17 +244,47 @@
                             android:src="@drawable/ic_settings"
                             app:tint="#FFB300"
                             android:rotation="45"/>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
                             android:orientation="horizontal">
-                            <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:text="A" android:textColor="#999" android:textSize="12sp"/>
-                            <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:text="B" android:textColor="#999" android:textSize="12sp"/>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="A"
+                                android:textColor="#999"
+                                android:textSize="12sp"/>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="B"
+                                android:textColor="#999"
+                                android:textSize="12sp"/>
                             <Space android:layout_width="20dp" android:layout_height="wrap_content"/>
-                            <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:text="C" android:textColor="#999" android:textSize="12sp"/>
-                            <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:text="D" android:textColor="#999" android:textSize="12sp"/>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="C"
+                                android:textColor="#999"
+                                android:textSize="12sp"/>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="D"
+                                android:textColor="#999"
+                                android:textSize="12sp"/>
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -173,6 +308,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -180,23 +316,70 @@
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="16dp">
-                        <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                            <View android:layout_width="10dp" android:layout_height="10dp" android:background="@drawable/bg_seat_booked"/>
-                            <TextView android:text=" Booked" android:layout_marginStart="8dp" android:textSize="12sp" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <View
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_seat_booked"/>
+                            <TextView
+                                android:text=" Booked"
+                                android:layout_marginStart="8dp"
+                                android:textSize="12sp"
+                                android:textColor="#555"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
-                        <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                            <View android:layout_width="10dp" android:layout_height="10dp" android:background="@drawable/bg_seat_selected"/>
-                            <TextView android:text=" Your Seat" android:layout_marginStart="8dp" android:textSize="12sp" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <View
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_seat_selected"/>
+                            <TextView
+                                android:text=" Your Seat"
+                                android:layout_marginStart="8dp"
+                                android:textSize="12sp"
+                                android:textColor="#555"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
-                        <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="24dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                            <View android:layout_width="10dp" android:layout_height="10dp" android:background="@drawable/bg_seat_available"/>
-                            <TextView android:text=" Available" android:layout_marginStart="8dp" android:textSize="12sp" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="24dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <View
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_seat_available"/>
+                            <TextView
+                                android:text=" Available"
+                                android:layout_marginStart="8dp"
+                                android:textSize="12sp"
+                                android:textColor="#555"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
+
                         <TextView
                             android:id="@+id/btnLowerDeck"
                             android:layout_width="match_parent"
@@ -207,6 +390,7 @@
                             android:textColor="#D50000"
                             android:textSize="12sp"
                             android:background="@drawable/bg_outline_red"/>
+
                         <TextView
                             android:id="@+id/btnUpperDeck"
                             android:layout_marginTop="12dp"
@@ -250,11 +434,39 @@
         android:background="@drawable/bg_bottom_nav"
         android:gravity="center"
         android:orientation="horizontal">
-        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:layout_marginHorizontal="30dp" android:src="@drawable/ic_home" app:tint="#FFF" />
-        <FrameLayout android:layout_width="50dp" android:layout_height="50dp" android:background="@drawable/bg_input_field">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:src="@drawable/ic_ticket" app:tint="#D50000" />
+
+        <ImageView
+            android:id="@+id/navHome"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginHorizontal="30dp"
+            android:src="@drawable/ic_home"
+            app:tint="#FFF" />
+
+        <FrameLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_input_field">
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_ticket"
+                app:tint="#D50000" />
         </FrameLayout>
-        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:layout_marginHorizontal="30dp" android:src="@drawable/ic_wallet" app:tint="#FFF" />
-        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:layout_marginHorizontal="20dp" android:src="@drawable/ic_settings" app:tint="#FFF" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginHorizontal="30dp"
+            android:src="@drawable/ic_wallet"
+            app:tint="#FFF" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginHorizontal="20dp"
+            android:src="@drawable/ic_settings"
+            app:tint="#FFF" />
     </LinearLayout>
 </RelativeLayout>
