@@ -38,7 +38,7 @@ class SignupSuccessActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     withContext(Dispatchers.IO) {
-                        authService.resendSignupConfirmation(email)
+                        authService.resendSignupOtp(email)
                     }
                     Toast.makeText(
                         this@SignupSuccessActivity,

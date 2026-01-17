@@ -86,6 +86,30 @@ class AuthService {
         client.auth.signOut()
     }
 
+    /**
+     * Xác thực OTP code gửi qua email khi đăng ký.
+     * Supabase gửi OTP trong email khi bật "Confirm email" trong project settings.
+     */
+    suspend fun verifySignupOtp(email: String, otp: String) {
+        client.auth.verifyEmailOtp(
+            type = OtpType.Email.SIGNUP,
+            email = email.trim(),
+            token = otp.trim()
+        )
+    }
+
+    /**
+     * Gửi lại OTP code đến email (resend confirmation).
+     * Lưu ý: Supabase có rate limit (mặc định 60s giữa các lần gửi).
+     */
+    suspend fun resendSignupOtp(email: String) {
+        client.auth.resendEmail(
+            type = OtpType.Email.SIGNUP,
+            email = email.trim()
+        )
+    }
+
+
     suspend fun getProfileByAuthId(authId: String): AppUser? {
         return try {
             val list = client
