@@ -27,7 +27,9 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class PaymentActivity : AppCompatActivity() {
 
@@ -126,7 +128,13 @@ class PaymentActivity : AppCompatActivity() {
                     val trip = tripsService.getTripById(tripId)
                         ?: throw Exception("Trip not found")
 
-                    val unitPrice = trip.price
+                    // --- LOGIC TĂNG GIÁ 10% VÀO CUỐI TUẦN ---
+                    val dateStr = intent.getStringExtra("DATE") ?: ""
+                    val isWeekend = isWeekend(dateStr)
+                    val multiplier = if (isWeekend) 1.1 else 1.0
+                    val unitPrice = trip.price * multiplier
+                    // ----------------------------------------
+
                     if (unitPrice <= 0) throw Exception("Trip price invalid: $unitPrice")
 
                     val totalPrice = unitPrice * selectedSeats.size
@@ -231,5 +239,18 @@ class PaymentActivity : AppCompatActivity() {
         }
 
         return booking.id
+    }
+
+    private fun isWeekend(date: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val d = sdf.parse(date) ?: return false
+            val cal = Calendar.getInstance()
+            cal.time = d
+            val day = cal.get(Calendar.DAY_OF_WEEK)
+            day == Calendar.SATURDAY || day == Calendar.SUNDAY
+        } catch (e: Exception) {
+            false
+        }
     }
 }

@@ -18,6 +18,8 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 class SeatSelectionActivity : AppCompatActivity() {
@@ -52,12 +54,21 @@ class SeatSelectionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_seat_selection)
 
         tripId = intent.getLongExtra("TRIP_ID", -1)
-        ticketPrice = intent.getDoubleExtra("PRICE", 0.0)
+        var basePrice = intent.getDoubleExtra("PRICE", 0.0)
         operatorName = intent.getStringExtra("OPERATOR") ?: "Unknown"
         busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
         fromLoc = intent.getStringExtra("FROM_LOC") ?: "Start"
         toLoc = intent.getStringExtra("TO_LOC") ?: "End"
         dateStr = intent.getStringExtra("DATE") ?: "Date"
+
+        // --- LOGIC TĂNG GIÁ ---
+        val isWeekend = isWeekend(dateStr)
+        ticketPrice = if (isWeekend) basePrice * 1.1 else basePrice
+        // ----------------------
+
+        if (isWeekend) {
+            Toast.makeText(this, "Cuối tuần: Giá vé đã tăng 10%", Toast.LENGTH_LONG).show()
+        }
 
         findViewById<TextView>(R.id.tvRouteFrom).text = fromLoc
         findViewById<TextView>(R.id.tvRouteTo).text = toLoc
@@ -65,9 +76,15 @@ class SeatSelectionActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvOperator).text = operatorName
         findViewById<TextView>(R.id.tvBusType).text = busType
         
-        // CHANGED: Formatting
         val priceStr = if (ticketPrice % 1.0 == 0.0) "%.0f".format(Locale.US, ticketPrice) else "%.2f".format(Locale.US, ticketPrice)
-        findViewById<TextView>(R.id.tvTicketPrice).text = "LKR $priceStr"
+        val tvPrice = findViewById<TextView>(R.id.tvTicketPrice)
+        
+        if (isWeekend) {
+            tvPrice.text = "LKR $priceStr (+10%)"
+            tvPrice.setTextColor(android.graphics.Color.parseColor("#D50000"))
+        } else {
+            tvPrice.text = "LKR $priceStr"
+        }
 
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         findViewById<TextView>(R.id.tvHeaderName).text = "Hello $userEmail!"
@@ -219,9 +236,21 @@ class SeatSelectionActivity : AppCompatActivity() {
             btnConfirmSeat.text = "Select a seat"
         } else {
             val s = selectedSeats.joinToString(",")
-            // CHANGED: Formatting
             val totalStr = if (total % 1.0 == 0.0) "%.0f".format(Locale.US, total) else "%.2f".format(Locale.US, total)
             btnConfirmSeat.text = "Book $s (LKR $totalStr)"
+        }
+    }
+
+    private fun isWeekend(date: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val d = sdf.parse(date) ?: return false
+            val cal = Calendar.getInstance()
+            cal.time = d
+            val day = cal.get(Calendar.DAY_OF_WEEK)
+            day == Calendar.SATURDAY || day == Calendar.SUNDAY
+        } catch (e: Exception) {
+            false
         }
     }
 }

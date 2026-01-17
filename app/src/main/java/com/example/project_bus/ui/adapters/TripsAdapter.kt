@@ -7,10 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project_bus.R
 import com.example.project_bus.data.models.Trip
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 class TripsAdapter(
     private val tripList: List<Trip>,
+    private val dateStr: String,
     private val onTripClick: (Trip) -> Unit
 ) : RecyclerView.Adapter<TripsAdapter.TripViewHolder>() {
 
@@ -35,15 +38,23 @@ class TripsAdapter(
 
         holder.tvOperator.text = trip.operatorName ?: "Unknown"
 
-        // CHANGED: Use %.0f for clean display or %.2f for precise display depending on requirement.
-        // Using "%.0f" to match previous integer look but with rounding, NOT truncation.
-        // If you want decimals, use "%.2f".
-        val priceStr = if (trip.price % 1.0 == 0.0) {
-            "%.0f".format(Locale.US, trip.price) 
+        // LOGIC TĂNG GIÁ
+        val isWeekend = isWeekend(dateStr)
+        val finalPrice = if (isWeekend) trip.price * 1.1 else trip.price
+
+        val priceStr = if (finalPrice % 1.0 == 0.0) {
+            "%.0f".format(Locale.US, finalPrice) 
         } else {
-            "%.2f".format(Locale.US, trip.price)
+            "%.2f".format(Locale.US, finalPrice)
         }
-        holder.tvPrice.text = "LKR $priceStr"
+        
+        if (isWeekend) {
+            holder.tvPrice.text = "LKR $priceStr (+10%)"
+            holder.tvPrice.setTextColor(android.graphics.Color.parseColor("#D50000"))
+        } else {
+            holder.tvPrice.text = "LKR $priceStr"
+            holder.tvPrice.setTextColor(android.graphics.Color.parseColor("#FF9800"))
+        }
 
         holder.tvBusType.text = trip.busType ?: "Standard"
         holder.tvSeatsLeft.text = "${trip.totalSeats} Seats Left"
@@ -72,6 +83,19 @@ class TripsAdapter(
             candidate.substring(0, 5)
         } else {
             "--:--"
+        }
+    }
+
+    private fun isWeekend(date: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val d = sdf.parse(date) ?: return false
+            val cal = Calendar.getInstance()
+            cal.time = d
+            val day = cal.get(Calendar.DAY_OF_WEEK)
+            day == Calendar.SATURDAY || day == Calendar.SUNDAY
+        } catch (e: Exception) {
+            false
         }
     }
 }

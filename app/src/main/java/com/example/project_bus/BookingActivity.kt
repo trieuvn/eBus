@@ -18,6 +18,9 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class BookingActivity : AppCompatActivity() {
 
@@ -74,6 +77,12 @@ class BookingActivity : AppCompatActivity() {
     private fun searchTrips(from: String, to: String, dateStr: String) = lifecycleScope.launch {
         Log.d("Booking", "Searching for $from -> $to")
 
+        // --- HIỂN THỊ CẢNH BÁO TĂNG GIÁ ---
+        if (isWeekend(dateStr)) {
+            Toast.makeText(this@BookingActivity, "Lưu ý: Giá vé tăng 10% vào ngày cuối tuần (T7, CN)!", Toast.LENGTH_LONG).show()
+        }
+        // -----------------------------------
+
         try {
             val allRoutes = withContext(Dispatchers.IO) { routesService.getAllRoutes() }
 
@@ -87,7 +96,6 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // Dữ liệu này trả về List<models.Trip>
             val allTrips = withContext(Dispatchers.IO) { tripsService.getAllTrips() }
 
             val filteredTrips = allTrips.filter { it.routeId == matchedRoute.id && it.status == 1 }
@@ -98,10 +106,11 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
-            rvTrips.adapter = TripsAdapter(filteredTrips) { trip -> 
+            // Truyền dateStr vào Adapter để hiển thị giá đã tăng
+            rvTrips.adapter = TripsAdapter(filteredTrips, dateStr) { trip -> 
                 val intent = Intent(this@BookingActivity, SeatSelectionActivity::class.java)
                 intent.putExtra("TRIP_ID", trip.id)
-                intent.putExtra("PRICE", trip.price)
+                intent.putExtra("PRICE", trip.price) 
                 intent.putExtra("OPERATOR", trip.operatorName)
                 intent.putExtra("BUS_TYPE", trip.busType)
                 intent.putExtra("FROM_LOC", from)
@@ -113,6 +122,19 @@ class BookingActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("BookingActivity", "searchTrips failed", e)
             Toast.makeText(this@BookingActivity, "Search failed. Please try again.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isWeekend(date: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val d = sdf.parse(date) ?: return false
+            val cal = Calendar.getInstance()
+            cal.time = d
+            val day = cal.get(Calendar.DAY_OF_WEEK)
+            day == Calendar.SATURDAY || day == Calendar.SUNDAY
+        } catch (e: Exception) {
+            false
         }
     }
 }
