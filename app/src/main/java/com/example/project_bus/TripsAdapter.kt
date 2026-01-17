@@ -5,21 +5,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.project_bus.data.models.Trip
+import com.example.project_bus.data.model.Trip
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TripsAdapter(
-    private val trips: List<Trip>,
-    private val onClick: (Trip) -> Unit
+    private val tripList: List<Trip>,
+    private val onTripClick: (Trip) -> Unit
 ) : RecyclerView.Adapter<TripsAdapter.TripViewHolder>() {
 
-    class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvBusName: TextView = view.findViewById(R.id.tvBusName)
-        val tvBusType: TextView = view.findViewById(R.id.tvBusType) // Mới
-        val tvPrice: TextView = view.findViewById(R.id.tvPrice)
-        val tvTime: TextView = view.findViewById(R.id.tvTime)
-        val tvSeatsLeft: TextView = view.findViewById(R.id.tvSeatsLeft) // Mới
-        // Nút Book giờ là toàn bộ CardView
-        val cardView: View = view
+    class TripViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvOperator: TextView = itemView.findViewById(R.id.tvOperatorName)
+        val tvPrice: TextView = itemView.findViewById(R.id.tvTripPrice)
+        val tvBusType: TextView = itemView.findViewById(R.id.tvBusType)
+        val tvSeats: TextView = itemView.findViewById(R.id.tvSeatsAvailable)
+        val tvStartTime: TextView = itemView.findViewById(R.id.tvStartTime)
+        val tvEndTime: TextView = itemView.findViewById(R.id.tvEndTime)
+        val tvDuration: TextView = itemView.findViewById(R.id.tvDuration)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
@@ -29,29 +31,49 @@ class TripsAdapter(
     }
 
     override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
-        val trip = trips[position]
+        val trip = tripList[position]
 
-        // Tên nhà xe (Nếu trong DB chưa có cột operator_name thì fix cứng test trước)
-        holder.tvBusName.text = trip.operatorName ?: "Perera Travels"
+        // 1. Set Operator Name & Price
+        holder.tvOperator.text = trip.operatorName ?: "Unknown Bus"
+        holder.tvPrice.text = "LKR ${trip.price}"
 
-        // Loại xe
-        holder.tvBusType.text = trip.busType ?: "A/C Sleeper (2+1)"
+        // 2. Set Bus Type & Seats
+        holder.tvBusType.text = trip.busType ?: "Standard"
+        val seatsLeft = trip.totalSeats // Hoặc tính toán seatsAvailable nếu có logic
+        holder.tvSeats.text = "$seatsLeft Seats left"
 
-        // Giá tiền (Thêm chữ LKR và định dạng số)
-        holder.tvPrice.text = "LKR ${trip.price.toInt()}"
+        // 3. Format Time (Giả sử startTime là string "HH:mm:ss" hoặc "HH:mm")
+        // Nếu DB lưu kiểu khác, bạn cần sửa logic này.
+        val start = formatTime(trip.startTime)
+        val end = formatTime(trip.endTime)
+        
+        holder.tvStartTime.text = start
+        holder.tvEndTime.text = end
+        
+        // Tính duration giả định (bạn nên tính chính xác từ object Trip)
+        holder.tvDuration.text = calculateDuration(start, end)
 
-        // Thời gian (Giả lập giờ đến bằng cách cộng 45p vào giờ đi cho giống mẫu)
-        val startTime = trip.departureTime?.take(5) ?: "09:00"
-        holder.tvTime.text = "$startTime AM - ... AM"
-
-        // Số ghế (Giả lập hoặc lấy từ DB)
-        holder.tvSeatsLeft.text = "15 Seats left"
-
-        // Bấm vào cả thẻ để đặt vé
-        holder.cardView.setOnClickListener {
-            onClick(trip)
+        // 4. Handle Click
+        holder.itemView.setOnClickListener {
+            onTripClick(trip)
         }
     }
 
-    override fun getItemCount() = trips.size
+    override fun getItemCount(): Int = tripList.size
+
+    // Helper: Cắt chuỗi lấy giờ:phút (Ví dụ: "08:00:00" -> "08:00")
+    private fun formatTime(time: String?): String {
+        if (time.isNullOrEmpty()) return "--:--"
+        return try {
+            time.substring(0, 5) 
+        } catch (e: Exception) {
+            time
+        }
+    }
+
+    // Helper: Tính khoảng thời gian đơn giản
+    private fun calculateDuration(start: String, end: String): String {
+        // Logic tính toán đơn giản, thực tế nên dùng Date/Time library
+        return "Direct" 
+    }
 }

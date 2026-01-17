@@ -15,22 +15,6 @@
         android:padding="20dp">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="12dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_home"
-                android:rotation="180"
-                app:tint="#333" />
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:cardCornerRadius="20dp"
@@ -68,22 +52,26 @@
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/btnCalendar"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_date_button">
+
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_calendar"
-                app:tint="#333"/>
+                app:tint="#333" />
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/btnNotification"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/bg_date_button">
+
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -122,7 +110,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvSummaryFrom"
+                    android:id="@+id/tvCardFrom"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -133,6 +121,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/btnSwap"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_marginHorizontal="16dp"
@@ -143,7 +132,7 @@
                     app:tint="#FFF" />
 
                 <TextView
-                    android:id="@+id/tvSummaryTo"
+                    android:id="@+id/tvCardTo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -155,7 +144,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvSummaryDate"
+                android:id="@+id/tvCardDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -169,22 +158,63 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/tvResultCount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="20dp"
-        android:paddingBottom="8dp"
-        android:text="Searching..."
-        android:textColor="#555"
-        android:textSize="13sp" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTrips"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="20dp" />
+        android:paddingStart="-10dp"
+        android:paddingEnd="-10dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="10dp"
+        tools:listitem="@layout/item_trip" />
+
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_bottom_nav"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_input_white">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_home"
+                app:tint="#D50000" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/navTicket"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginHorizontal="30dp"
+            android:src="@drawable/ic_ticket"
+            app:tint="#FF8A80" />
+
+        <ImageView
+            android:id="@+id/navWallet"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginHorizontal="30dp"
+            android:src="@drawable/ic_wallet"
+            app:tint="#FF8A80" />
+
+        <ImageView
+            android:id="@+id/navSettings"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginHorizontal="20dp"
+            android:src="@drawable/ic_settings"
+            app:tint="#FF8A80" />
+    </LinearLayout>
 
 </LinearLayout>

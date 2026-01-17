@@ -1,93 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="16dp"
     android:layout_marginHorizontal="4dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="16dp"
-    app:cardElevation="3dp">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/tvIndex"
+            android:id="@+id/tvHistoryIndex"
             android:layout_width="50dp"
             android:layout_height="match_parent"
-            android:background="#FF9800"
+            android:background="@drawable/bg_booking_item_left"
             android:gravity="center"
             android:text="1"
             android:textColor="#FFF"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:minHeight="90dp"/>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="Bus Ticket"
-                android:textColor="#333"
-                android:textStyle="bold" />
+                android:text="Bus Route"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginBottom="6dp"/>
 
             <TextView
-                android:id="@+id/tvFrom"
+                android:id="@+id/tvHistoryOrigin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="From: ..."
+                android:text="From: Kelaniya"
                 android:textColor="#555"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tvTo"
+                android:id="@+id/tvHistoryDestination"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="To: ..."
+                android:text="To: Colombo"
                 android:textColor="#555"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="90dp"
+            android:layout_width="120dp"
             android:layout_height="match_parent"
-            android:background="#222"
+            android:background="@drawable/bg_booking_item_right"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Departure"
-                android:textColor="#AAA"
-                android:textSize="10sp" />
+                android:textColor="#AAAAAA"
+                android:textSize="10sp"
+                android:textAllCaps="false"/>
 
             <TextView
-                android:id="@+id/tvTime"
+                android:id="@+id/tvHistoryTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="--:--"
-                android:textColor="#FFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:text="9 AM"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
 
             <TextView
-                android:id="@+id/tvDate"
+                android:id="@+id/tvHistoryDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Date"
-                android:textColor="#FFF"
-                android:textSize="11sp" />
+                android:text="2024.12.08"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

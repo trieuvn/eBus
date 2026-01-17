@@ -21,47 +21,45 @@ class GuestDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guest_details)
 
-        // 1. Nhận dữ liệu
         val operator = intent.getStringExtra("OPERATOR") ?: "Bus"
         val busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
         val seats = intent.getStringArrayListExtra("SELECTED_SEATS") ?: arrayListOf()
-        val total = intent.getDoubleExtra("TOTAL_PRICE", 0.0)
+        // val total = intent.getDoubleExtra("TOTAL_PRICE", 0.0) // Không cần dùng ở đây
 
-        // 2. Hiển thị thông tin Header
         findViewById<TextView>(R.id.tvBusName).text = operator
         findViewById<TextView>(R.id.tvBusType).text = busType
-        // Giờ đi lấy từ Intent hoặc fix cứng tạm nếu chưa có
-        // findViewById<TextView>(R.id.tvTripTime).text = "..."
 
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         findViewById<TextView>(R.id.tvHeaderUser).text = "Hello $userEmail!"
 
-        // Nút Back
         findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
 
-        // 3. TẠO FORM NHẬP LIỆU ĐỘNG
         containerPassengers = findViewById(R.id.containerPassengers)
 
+        // Tạo ô nhập liệu cho từng ghế
         for ((index, seat) in seats.withIndex()) {
             addPassengerInput(index + 1, seat)
         }
 
-        // 4. XỬ LÝ NÚT PROCEED
         findViewById<android.view.View>(R.id.btnProceedBook).setOnClickListener {
             if (validateInputs()) {
-                val contactMobile = findViewById<EditText>(R.id.etContactMobile).text.toString()
-                val contactEmail = findViewById<EditText>(R.id.etContactEmail).text.toString()
+                val contactMobile = findViewById<EditText>(R.id.etContactMobile).text.toString().trim()
+                val contactEmail = findViewById<EditText>(R.id.etContactEmail).text.toString().trim()
+
+                // Lấy danh sách tên hành khách
+                val passengerNames = passengerInputViews.map { it.etName.text.toString().trim() }
+
+                // Lấy tên người liên hệ (Mặc định là người đầu tiên nếu không nhập gì khác)
+                // Vì layout không có ô Contact Name, ta lấy tên hành khách đầu tiên làm đại diện
+                val contactName = passengerNames.firstOrNull() ?: "Unknown"
 
                 val nextIntent = Intent(this, PaymentActivity::class.java)
-                nextIntent.putExtras(intent) // Chuyển tiếp toàn bộ dữ liệu cũ
+                nextIntent.putExtras(intent) // Truyền tiếp các dữ liệu cũ (TripID, Seats, Price...)
 
-                // Gửi thông tin liên hệ
+                nextIntent.putExtra("CONTACT_NAME", contactName) // Thêm dòng này
                 nextIntent.putExtra("CONTACT_MOBILE", contactMobile)
                 nextIntent.putExtra("CONTACT_EMAIL", contactEmail)
-
-                // Gửi danh sách tên hành khách (nếu cần thiết cho vé)
-                // val passengerNames = passengerInputViews.map { it.etName.text.toString() }
-                // nextIntent.putStringArrayListExtra("PASSENGER_NAMES", ArrayList(passengerNames))
+                nextIntent.putStringArrayListExtra("PASSENGER_NAMES", ArrayList(passengerNames))
 
                 startActivity(nextIntent)
             }
@@ -78,34 +76,37 @@ class GuestDetailsActivity : AppCompatActivity() {
 
         tvLabel.text = "Passenger $index (Seat $seatName)"
 
-        // Lưu tham chiếu để lấy dữ liệu sau này
         passengerInputViews.add(PassengerInputView(etName, etAge, rgGender))
-
         containerPassengers.addView(view)
     }
 
     private fun validateInputs(): Boolean {
         for (input in passengerInputViews) {
-            if (input.etName.text.isEmpty()) {
+            if (input.etName.text.isBlank()) {
                 input.etName.error = "Required"
                 return false
             }
-            if (input.etAge.text.isEmpty()) {
+            if (input.etAge.text.isBlank()) {
                 input.etAge.error = "Required"
                 return false
             }
         }
 
         val mobile = findViewById<EditText>(R.id.etContactMobile)
-        if (mobile.text.isEmpty()) {
+        if (mobile.text.isBlank()) {
             mobile.error = "Required"
+            return false
+        }
+
+        val email = findViewById<EditText>(R.id.etContactEmail)
+        if (email.text.isBlank()) {
+            email.error = "Required"
             return false
         }
 
         return true
     }
 
-    // Class helper để lưu trữ view của từng hành khách
     data class PassengerInputView(
         val etName: EditText,
         val etAge: EditText,

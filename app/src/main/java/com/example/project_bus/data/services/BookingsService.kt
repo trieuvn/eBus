@@ -12,28 +12,34 @@ class BookingsService {
 
     private val client = SupabaseProvider.client
 
-    // --- HÀM MỚI BẮT BUỘC PHẢI CÓ ---
     suspend fun getBookingsByUserId(userId: String): List<Booking> =
         client.from(Tables.BOOKINGS)
             .select {
-                filter {
-                    // Lọc theo user_id chính xác
-                    eq("user_id", userId)
-                }
-                // Sắp xếp vé mới nhất lên đầu
+                filter { eq("user_id", userId) }
                 order("created_at", order = Order.DESCENDING)
             }
-            .decodeList<Booking>()
-    // --------------------------------
+            .decodeList()
 
-    suspend fun getAllBookings(): List<Booking> =
-        client.from(Tables.BOOKINGS).select().decodeList<Booking>()
+    suspend fun getBookingsByTripId(tripId: Long): List<Booking> =
+        client.from(Tables.BOOKINGS)
+            .select {
+                filter {
+                    eq("trip_id", tripId)
+                }
+            }
+            .decodeList()
 
     suspend fun getBookingById(id: Long): Booking? =
-        client.from(Tables.BOOKINGS).select { filter { eq("id", id) } }.decodeList<Booking>().firstOrNull()
+        client.from(Tables.BOOKINGS)
+            .select { filter { eq("id", id) } }
+            .decodeList<Booking>()
+            .firstOrNull()
 
+    // Hàm quan trọng để tạo Booking và trả về ID
     suspend fun createBooking(booking: BookingCreate): Booking =
-        client.from(Tables.BOOKINGS).insert(booking) { select() }.decodeSingle<Booking>()
+        client.from(Tables.BOOKINGS)
+            .insert(booking) { select() } // select() là bắt buộc để trả về dữ liệu
+            .decodeSingle()
 
     suspend fun updateBooking(id: Long, update: BookingUpdate): Booking =
         client.from(Tables.BOOKINGS).update({
@@ -47,11 +53,10 @@ class BookingsService {
         }) {
             select()
             filter { eq("id", id) }
-        }.decodeSingle<Booking>()
+        }.decodeSingle()
 
     suspend fun deleteById(id: Long): Booking =
-        client.from(Tables.BOOKINGS).delete {
-            select()
-            filter { eq("id", id) }
-        }.decodeSingle<Booking>()
+        client.from(Tables.BOOKINGS)
+            .delete { select(); filter { eq("id", id) } }
+            .decodeSingle()
 }
