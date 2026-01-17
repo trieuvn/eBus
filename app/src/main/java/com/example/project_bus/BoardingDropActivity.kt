@@ -15,6 +15,7 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class BoardingDropActivity : AppCompatActivity() {
 
@@ -25,7 +26,6 @@ class BoardingDropActivity : AppCompatActivity() {
     private lateinit var tvSelectedDrop: TextView
     private var selectedBoardingId: Int = -1
     private var selectedDropId: Int = -1
-    
     private var availableStops = listOf<RouteStop>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,14 +40,17 @@ class BoardingDropActivity : AppCompatActivity() {
         // Setup UI Header
         findViewById<TextView>(R.id.tvHeaderFrom).text = fromLoc
         findViewById<TextView>(R.id.tvHeaderTo).text = toLoc
-        findViewById<TextView>(R.id.tvTotalFare).text = "LKR ${totalPrice.toInt()}"
+        
+        // CHANGED: Formatting
+        val totalStr = if (totalPrice % 1.0 == 0.0) "%.0f".format(Locale.US, totalPrice) else "%.2f".format(Locale.US, totalPrice)
+        findViewById<TextView>(R.id.tvTotalFare).text = "LKR $totalStr"
+        
         val user = SupabaseProvider.client.auth.currentUserOrNull()
         findViewById<TextView>(R.id.tvHeaderUser).text = "Hello ${user?.email}!"
 
         tvSelectedBoarding = findViewById(R.id.tvSelectedBoarding)
         tvSelectedDrop = findViewById(R.id.tvSelectedDrop)
         
-        // Load stops logic
         loadStopsForTrip(tripId)
 
         findViewById<android.view.View>(R.id.layoutBoarding).setOnClickListener {

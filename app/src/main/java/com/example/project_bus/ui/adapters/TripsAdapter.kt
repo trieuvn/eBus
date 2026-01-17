@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project_bus.R
 import com.example.project_bus.data.models.Trip
+import java.util.Locale
 
 class TripsAdapter(
     private val tripList: List<Trip>,
@@ -33,18 +34,25 @@ class TripsAdapter(
         val trip = tripList[position]
 
         holder.tvOperator.text = trip.operatorName ?: "Unknown"
-        holder.tvPrice.text = "LKR ${trip.price}"
+
+        // CHANGED: Use %.0f for clean display or %.2f for precise display depending on requirement.
+        // Using "%.0f" to match previous integer look but with rounding, NOT truncation.
+        // If you want decimals, use "%.2f".
+        val priceStr = if (trip.price % 1.0 == 0.0) {
+            "%.0f".format(Locale.US, trip.price) 
+        } else {
+            "%.2f".format(Locale.US, trip.price)
+        }
+        holder.tvPrice.text = "LKR $priceStr"
+
         holder.tvBusType.text = trip.busType ?: "Standard"
         holder.tvSeatsLeft.text = "${trip.totalSeats} Seats Left"
 
         val start = formatTime(trip.departureTime)
         val end = formatTime(trip.arrivalTime)
 
-        // Dòng thời gian nằm đúng chỗ (không còn hiện 2025-)
         holder.tvStartTime.text = "$start  —  $end"
-        holder.tvEndTime.text = "" // tvEndTime đang GONE trong layout
-
-        // Bạn có thể thay bằng tính phút nếu muốn; hiện tại giữ "Direct" như cũ
+        holder.tvEndTime.text = ""
         holder.tvDuration.text = "Direct"
 
         holder.itemView.setOnClickListener { onTripClick(trip) }
@@ -52,20 +60,14 @@ class TripsAdapter(
 
     override fun getItemCount(): Int = tripList.size
 
-    /**
-     * Fix lỗi DB trả về dạng "2025-01-16 09:00:00" hoặc "2025-01-16T09:00:00"
-     * mà code cũ substring(0,5) => "2025-"
-     */
     private fun formatTime(raw: String?): String {
         if (raw.isNullOrBlank()) return "--:--"
-
         val candidate = when {
-            raw.contains("T") -> raw.substringAfter("T")   // ISO: 2025-01-16T09:00:00
-            raw.contains(" ") -> raw.substringAfter(" ")   // SQL: 2025-01-16 09:00:00
-            else -> raw                                     // 09:00:00 hoặc 09:00
+            raw.contains("T") -> raw.substringAfter("T")   
+            raw.contains(" ") -> raw.substringAfter(" ")   
+            else -> raw                                     
         }.trim()
 
-        // Lấy HH:mm
         return if (candidate.length >= 5 && candidate[2] == ':') {
             candidate.substring(0, 5)
         } else {

@@ -18,6 +18,7 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class SeatSelectionActivity : AppCompatActivity() {
 
@@ -43,7 +44,6 @@ class SeatSelectionActivity : AppCompatActivity() {
     private var toLoc: String = ""
     private var dateStr: String = ""
 
-    // Services
     private val bookingsService = BookingsService()
     private val passengersService = BookingPassengersService()
 
@@ -64,7 +64,10 @@ class SeatSelectionActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvRouteDate).text = dateStr
         findViewById<TextView>(R.id.tvOperator).text = operatorName
         findViewById<TextView>(R.id.tvBusType).text = busType
-        findViewById<TextView>(R.id.tvTicketPrice).text = "LKR ${ticketPrice.toInt()}"
+        
+        // CHANGED: Formatting
+        val priceStr = if (ticketPrice % 1.0 == 0.0) "%.0f".format(Locale.US, ticketPrice) else "%.2f".format(Locale.US, ticketPrice)
+        findViewById<TextView>(R.id.tvTicketPrice).text = "LKR $priceStr"
 
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         findViewById<TextView>(R.id.tvHeaderName).text = "Hello $userEmail!"
@@ -76,10 +79,7 @@ class SeatSelectionActivity : AppCompatActivity() {
         
         findViewById<CardView>(R.id.btnBack).setOnClickListener { finish() }
 
-        // 1. Tạo ghế trống trước
         initEmptySeats()
-
-        // 2. Setup RecyclerView
         setupRecyclerView("LOWER")
         
         btnLowerDeck.setOnClickListener { switchDeck("LOWER") }
@@ -102,26 +102,22 @@ class SeatSelectionActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Tải ghế đã đặt từ DB
         loadBookedSeats()
     }
 
     private fun loadBookedSeats() = lifecycleScope.launch {
         try {
-            // Lấy tất cả booking của chuyến này (chỉ lấy vé Confirmed = 1)
             val bookings = withContext(Dispatchers.IO) { 
                 bookingsService.getBookingsByTripId(tripId).filter { it.bookingStatus == 1 }
             }
             val bookingIds = bookings.map { it.id }
 
             if (bookingIds.isNotEmpty()) {
-                // Lấy tất cả hành khách của các booking đó -> ra số ghế
                 val passengers = withContext(Dispatchers.IO) {
                     passengersService.getPassengersByBookingIds(bookingIds)
                 }
                 val bookedSeatNumbers = passengers.mapNotNull { it.seatNumber }
 
-                // Cập nhật trạng thái ghế
                 updateListStatus(seatListLower, bookedSeatNumbers)
                 updateListStatus(seatListUpper, bookedSeatNumbers)
                 
@@ -136,7 +132,7 @@ class SeatSelectionActivity : AppCompatActivity() {
     private fun updateListStatus(list: ArrayList<Seat>, bookedNumbers: List<String>) {
         for (seat in list) {
             if (bookedNumbers.contains(seat.id)) {
-                seat.status = 1 // Booked
+                seat.status = 1 
             }
         }
     }
@@ -169,7 +165,6 @@ class SeatSelectionActivity : AppCompatActivity() {
     }
 
     private fun initEmptySeats() {
-        // Tầng dưới: L1 -> L20 (Mặc định status = 0 Available)
         var seatNum = 1
         for (row in 1..5) {
             for (col in 0..4) {
@@ -177,13 +172,12 @@ class SeatSelectionActivity : AppCompatActivity() {
                     seatListLower.add(Seat("AISLE_L_$row", -1))
                 } else {
                     val id = "L$seatNum"
-                    seatListLower.add(Seat(id, 0)) // Available
+                    seatListLower.add(Seat(id, 0)) 
                     seatNum++
                 }
             }
         }
         
-        // Tầng trên: U1 -> U20
         seatNum = 1
         for (row in 1..5) {
             for (col in 0..4) {
@@ -191,7 +185,7 @@ class SeatSelectionActivity : AppCompatActivity() {
                     seatListUpper.add(Seat("AISLE_U_$row", -1))
                 } else {
                     val id = "U$seatNum"
-                    seatListUpper.add(Seat(id, 0)) // Available
+                    seatListUpper.add(Seat(id, 0))
                     seatNum++
                 }
             }
@@ -217,7 +211,9 @@ class SeatSelectionActivity : AppCompatActivity() {
             btnConfirmSeat.text = "Select a seat"
         } else {
             val s = selectedSeats.joinToString(",")
-            btnConfirmSeat.text = "Book $s (LKR ${total.toInt()})"
+            // CHANGED: Formatting
+            val totalStr = if (total % 1.0 == 0.0) "%.0f".format(Locale.US, total) else "%.2f".format(Locale.US, total)
+            btnConfirmSeat.text = "Book $s (LKR $totalStr)"
         }
     }
 }

@@ -24,7 +24,7 @@ class GuestDetailsActivity : AppCompatActivity() {
         val operator = intent.getStringExtra("OPERATOR") ?: "Bus"
         val busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
         val seats = intent.getStringArrayListExtra("SELECTED_SEATS") ?: arrayListOf()
-        // val total = intent.getDoubleExtra("TOTAL_PRICE", 0.0) // Không cần dùng ở đây
+        val total = intent.getDoubleExtra("TOTAL_PRICE", 10000.0)
 
         findViewById<TextView>(R.id.tvBusName).text = operator
         findViewById<TextView>(R.id.tvBusType).text = busType
