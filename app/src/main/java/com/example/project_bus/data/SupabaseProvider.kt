@@ -3,6 +3,8 @@ package com.example.project_bus.data
 import com.example.project_bus.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 
@@ -32,6 +34,11 @@ object SupabaseProvider {
 
             // Database REST API
             install(Postgrest)
+
+            // Google OAuth support
+            install(ComposeAuth) {
+                googleNativeLogin(serverClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID)
+            }
         }
     }
 }
