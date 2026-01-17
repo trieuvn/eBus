@@ -1,7 +1,9 @@
 package com.example.project_bus
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -19,160 +21,170 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.UUID
 
-/**
- * NOTE: This screen is a UI demo for card input.
- * In production, do NOT handle raw card details yourself.
- * Use a PCI-compliant gateway (e.g., Stripe PaymentSheet / Google Pay).
- */
 class PaymentActivity : AppCompatActivity() {
 
     private val bookingsService = BookingsService()
     private val bookingPassengersService = BookingPassengersService()
     private val paymentsService = PaymentsService()
 
-    // Simple statuses for demo/testing
-    private val BOOKING_STATUS_CONFIRMED = 1
-    private val PAYMENT_STATUS_SUCCESS = 1
+    private lateinit var etCardName: EditText
+    private lateinit var etCardNumber: EditText
+    private lateinit var etCvv: EditText
+    private lateinit var tvExpMonth: TextView
+    private lateinit var tvExpYear: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
 
-        // Header card info
-        val tvBusName = findViewById<TextView>(R.id.tvBusName)
-        val tvBusType = findViewById<TextView>(R.id.tvBusType)
-        val tvBusTime = findViewById<TextView>(R.id.tvBusTime)
+        try {
+            val operator = intent.getStringExtra("OPERATOR") ?: ""
+            val busType = intent.getStringExtra("BUS_TYPE") ?: ""
+            val date = intent.getStringExtra("DATE") ?: ""
 
-        val operator = intent.getStringExtra("OPERATOR") ?: "Bus"
-        val busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
-        val date = intent.getStringExtra("DATE") ?: ""
-        tvBusName.text = operator
-        tvBusType.text = busType
-        tvBusTime.text = date
+            findViewById<TextView>(R.id.tvBusName).text = operator
+            findViewById<TextView>(R.id.tvBusType).text = busType
+            findViewById<TextView>(R.id.tvBusTime).text = date
 
-        // activity_payment.xml uses id="etCardName"
-        val etCardName = findViewById<EditText>(R.id.etCardName)
-        val etCardNumber = findViewById<EditText>(R.id.etCardNumber)
-        val etCvv = findViewById<EditText>(R.id.etCvv)
+            val user = SupabaseProvider.client.auth.currentUserOrNull()
+            findViewById<TextView>(R.id.tvUserName).text = "Hello ${user?.email ?: "User"}!"
 
-        val btnPayNow = findViewById<View>(R.id.btnPayNow)
+            etCardName = findViewById(R.id.etCardName)
+            etCardNumber = findViewById(R.id.etCardNumber)
+            etCvv = findViewById(R.id.etCvv)
+            tvExpMonth = findViewById(R.id.tvExpMonth)
+            tvExpYear = findViewById(R.id.tvExpYear)
 
-        btnPayNow.setOnClickListener {
-            if (!validateCardInputs(etCardName, etCardNumber, etCvv)) return@setOnClickListener
+            findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
 
-            // Create booking + passengers + payment on Supabase
-            btnPayNow.isEnabled = false
-            lifecycleScope.launch {
-                try {
-                    val bookingId = withContext(Dispatchers.IO) { createBookingAndPayment() }
-                    Toast.makeText(this@PaymentActivity, "Payment successful ✅", Toast.LENGTH_SHORT).show()
+            setupExpiryDatePickers()
 
-                    val i = Intent(this@PaymentActivity, PaymentSuccessActivity::class.java)
-                    i.putExtra("BOOKING_ID", bookingId)
-                    startActivity(i)
-                    finish()
-                } catch (e: Exception) {
-                    btnPayNow.isEnabled = true
-                    Toast.makeText(this@PaymentActivity, "Payment failed: ${e.message}", Toast.LENGTH_LONG).show()
-                }
+            val btnPayNow = findViewById<View>(R.id.btnPayNow)
+            btnPayNow.setOnClickListener {
+                processPayment(btnPayNow)
             }
+        } catch (e: Exception) {
+            Log.e("PaymentInit", "Error in onCreate", e)
+            Toast.makeText(this, "Init Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun validateCardInputs(
-        etCardName: EditText,
-        etCardNumber: EditText,
-        etCvv: EditText
-    ): Boolean {
-        val name = etCardName.text.toString().trim()
-        val number = etCardNumber.text.toString().replace(" ", "").trim()
-        val cvv = etCvv.text.toString().trim()
+    private fun setupExpiryDatePickers() {
+        val c = Calendar.getInstance()
+        val pickDate = {
+            DatePickerDialog(this, { _, year, month, _ ->
+                tvExpMonth.text = String.format("%02d", month + 1)
+                tvExpYear.text = year.toString()
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), 1).show()
+        }
+        tvExpMonth.setOnClickListener { pickDate() }
+        tvExpYear.setOnClickListener { pickDate() }
+    }
 
-        if (name.isEmpty()) {
-            etCardName.error = "Required"
-            return false
-        }
-        if (number.length < 12) {
-            etCardNumber.error = "Invalid card number"
-            return false
-        }
-        if (cvv.length < 3) {
-            etCvv.error = "Invalid CVC"
+    private fun validateInputs(): Boolean {
+        if (etCardName.text.isBlank()) { etCardName.error = "Required"; return false }
+        if (etCardNumber.text.length != 16) { etCardNumber.error = "16 digits required"; return false }
+        if (etCvv.text.length != 3) { etCvv.error = "3 digits required"; return false }
+        if (tvExpMonth.text == "Month" || tvExpYear.text == "Year") {
+            Toast.makeText(this, "Select Expiry Date", Toast.LENGTH_SHORT).show()
             return false
         }
         return true
     }
 
-    private suspend fun createBookingAndPayment(): Long {
-        val user = SupabaseProvider.client.auth.currentUserOrNull()
-            ?: throw IllegalStateException("Not signed in")
-        val userId = user.id
+    private fun processPayment(btn: View) {
+        if (!validateInputs()) return
 
-        val tripId = intent.getLongExtra("TRIP_ID", 0L)
-        if (tripId <= 0L) throw IllegalArgumentException("Missing trip")
+        btn.isEnabled = false
+        Toast.makeText(this, "Processing Payment...", Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch {
+            try {
+                // Chạy tác vụ mạng trong IO Dispatcher để không chặn UI
+                val bookingId = withContext(Dispatchers.IO) { createBookingRecord() }
+
+                Log.d("PaymentActivity", "Success! Booking ID: $bookingId")
+                Toast.makeText(this@PaymentActivity, "Booking Successful!", Toast.LENGTH_SHORT).show()
+
+                val i = Intent(this@PaymentActivity, PaymentSuccessActivity::class.java)
+                i.putExtra("BOOKING_ID", bookingId)
+                startActivity(i)
+                finish()
+            } catch (e: Exception) {
+                btn.isEnabled = true
+                e.printStackTrace()
+                Log.e("PaymentError", "Transaction Failed", e)
+
+                // Hiển thị lỗi cụ thể lên màn hình để dễ sửa
+                val errorMsg = e.message ?: "Unknown error"
+                Toast.makeText(this@PaymentActivity, "Failed: $errorMsg", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private suspend fun createBookingRecord(): Long {
+        val user = SupabaseProvider.client.auth.currentUserOrNull()
+            ?: throw Exception("User not logged in. Please relogin.")
+
+        val tripId = intent.getLongExtra("TRIP_ID", -1)
+        if (tripId == -1L) throw Exception("Invalid Trip ID")
 
         val selectedSeats = intent.getStringArrayListExtra("SELECTED_SEATS") ?: arrayListOf()
-        if (selectedSeats.isEmpty()) throw IllegalArgumentException("No seat selected")
+        val totalPrice = intent.getDoubleExtra("TOTAL_PRICE", 0.0)
 
-        val totalAmount = (intent.extras?.get("TOTAL_PRICE") as? Number)?.toInt() ?: 0
-        if (totalAmount <= 0) throw IllegalArgumentException("Invalid total")
+        // Lấy thông tin liên hệ, nếu thiếu thì lấy tên khách đầu tiên
+        val passengerNames = intent.getStringArrayListExtra("PASSENGER_NAMES") ?: arrayListOf()
+        var contactName = intent.getStringExtra("CONTACT_NAME")
+        if (contactName.isNullOrBlank()) {
+            contactName = passengerNames.firstOrNull() ?: "Unknown Guest"
+        }
 
-        val pickupStopId = intent.getIntExtra("PICKUP_STOP_ID", -1).takeIf { it > 0 }
-        val dropoffStopId = intent.getIntExtra("DROPOFF_STOP_ID", -1).takeIf { it > 0 }
+        val contactMobile = intent.getStringExtra("CONTACT_MOBILE")
+        val contactEmail = intent.getStringExtra("CONTACT_EMAIL")
 
-        val contactMobile = intent.getStringExtra("CONTACT_MOBILE")?.trim().orEmpty()
-        val contactEmail = intent.getStringExtra("CONTACT_EMAIL")?.trim().orEmpty()
-        val contactName = intent.getStringExtra("CONTACT_NAME")?.trim()
-            ?: (intent.getStringArrayListExtra("PASSENGER_NAMES")?.firstOrNull()?.trim() ?: "Guest")
+        Log.d("PaymentActivity", "Creating Booking... User: ${user.id}, Trip: $tripId")
 
-        val passengerNames = intent.getStringArrayListExtra("PASSENGER_NAMES")
-            ?: arrayListOf()
-
-        // 1) Create booking
+        // 1. Tạo Booking
         val booking = bookingsService.createBooking(
             BookingCreate(
+                userId = user.id,
                 tripId = tripId,
-                userId = userId,
-                pickupStopId = pickupStopId,
-                dropoffStopId = dropoffStopId,
+                pickupStopId = intent.getIntExtra("PICKUP_STOP_ID", -1).takeIf { it > 0 },
+                dropoffStopId = intent.getIntExtra("DROPOFF_STOP_ID", -1).takeIf { it > 0 },
                 contactName = contactName,
                 contactMobile = contactMobile,
                 contactEmail = contactEmail,
-                totalAmount = totalAmount.toDouble(),
-                bookingStatus = BOOKING_STATUS_CONFIRMED
+                totalAmount = totalPrice,
+                bookingStatus = 1
             )
         )
 
-        val bookingId = booking.id
-
-        // 2) Create booking passengers (seat -> name)
-        // If passengerNames is missing, fall back to "Passenger #n"
-        selectedSeats.forEachIndexed { idx, seatNo ->
-            val name = passengerNames.getOrNull(idx)?.takeIf { it.isNotBlank() }
-                ?: "Passenger ${idx + 1}"
+        // 2. Tạo Passengers
+        selectedSeats.forEachIndexed { index, seat ->
+            val pName = passengerNames.getOrNull(index) ?: "Guest"
             bookingPassengersService.createPassenger(
                 BookingPassengerCreate(
-                    bookingId = bookingId,
-                    seatNumber = seatNo,
-                    fullName = name
+                    bookingId = booking.id,
+                    seatNumber = seat,
+                    fullName = pName
                 )
             )
         }
 
-        // 3) Create payment record (demo)
-        val txRef = "TEST-${UUID.randomUUID()}"
+        // 3. Tạo Payment
         paymentsService.createPayment(
             PaymentCreate(
-                bookingId = bookingId,
-                transactionRef = txRef,
-                amount = totalAmount,
-                paymentMethod = "card",
-                paymentStatus = PAYMENT_STATUS_SUCCESS
+                bookingId = booking.id,
+                transactionRef = "TXN-${UUID.randomUUID().toString().take(8).uppercase()}",
+                amount = totalPrice.toInt(),
+                paymentMethod = "Card",
+                paymentStatus = 1
             )
         )
 
-        return bookingId
+        return booking.id
     }
 }

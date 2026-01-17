@@ -2,12 +2,11 @@ package com.example.project_bus
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.project_bus.data.SupabaseProvider
 import com.example.project_bus.data.models.RouteStop
 import com.example.project_bus.data.services.RoutesStopService
@@ -16,120 +15,92 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.lifecycle.lifecycleScope
-import io.github.jan.supabase.auth.auth
 
 class BoardingDropActivity : AppCompatActivity() {
 
-    // Biến lưu dữ liệu
-    private var selectedBoarding: String = ""
-    private var selectedDrop: String = ""
-
-    private var selectedBoardingStopId: Int? = null
-    private var selectedDropStopId: Int? = null
-
-    private val tripsService = TripsService()
     private val routesStopService = RoutesStopService()
+    private val tripsService = TripsService()
 
-    private var boardingStops: List<RouteStop> = emptyList()
-    private var dropStops: List<RouteStop> = emptyList()
+    private lateinit var tvSelectedBoarding: TextView
+    private lateinit var tvSelectedDrop: TextView
+    private var selectedBoardingId: Int = -1
+    private var selectedDropId: Int = -1
+    
+    private var availableStops = listOf<RouteStop>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_boarding_drop)
 
-        // 1. Ánh xạ View
-        val tvHeaderFrom = findViewById<TextView>(R.id.tvHeaderFrom)
-        val tvHeaderTo = findViewById<TextView>(R.id.tvHeaderTo)
-        val tvHeaderDate = findViewById<TextView>(R.id.tvHeaderDate)
-        val tvBusName = findViewById<TextView>(R.id.tvBusName)
-        val tvBusType = findViewById<TextView>(R.id.tvBusType)
-        val tvTicketPrice = findViewById<TextView>(R.id.tvTicketPrice)
-        val tvSeatNumbers = findViewById<TextView>(R.id.tvSeatNumbers)
-        val tvTotalFare = findViewById<TextView>(R.id.tvTotalFare)
-        val tvHeaderUser = findViewById<TextView>(R.id.tvHeaderUser)
+        val tripId = intent.getLongExtra("TRIP_ID", -1)
+        val fromLoc = intent.getStringExtra("FROM_LOC") ?: ""
+        val toLoc = intent.getStringExtra("TO_LOC") ?: ""
+        val totalPrice = intent.getDoubleExtra("TOTAL_PRICE", 0.0)
+        
+        // Setup UI Header
+        findViewById<TextView>(R.id.tvHeaderFrom).text = fromLoc
+        findViewById<TextView>(R.id.tvHeaderTo).text = toLoc
+        findViewById<TextView>(R.id.tvTotalFare).text = "LKR ${totalPrice.toInt()}"
+        val user = SupabaseProvider.client.auth.currentUserOrNull()
+        findViewById<TextView>(R.id.tvHeaderUser).text = "Hello ${user?.email}!"
 
-        val layoutBoarding = findViewById<LinearLayout>(R.id.layoutBoarding)
-        val tvSelectedBoarding = findViewById<TextView>(R.id.tvSelectedBoarding)
-        val layoutDrop = findViewById<LinearLayout>(R.id.layoutDrop)
-        val tvSelectedDrop = findViewById<TextView>(R.id.tvSelectedDrop)
-        val btnNext = findViewById<View>(R.id.btnNext)
-        val btnBack = findViewById<View>(R.id.btnBack)
+        tvSelectedBoarding = findViewById(R.id.tvSelectedBoarding)
+        tvSelectedDrop = findViewById(R.id.tvSelectedDrop)
+        
+        // Load stops logic
+        loadStopsForTrip(tripId)
 
-        // 2. Nhận dữ liệu từ Intent
-        val tripId = intent.getLongExtra("TRIP_ID", 0L)
-        val operator = intent.getStringExtra("OPERATOR") ?: "Bus"
-        val busType = intent.getStringExtra("BUS_TYPE") ?: "Standard"
-        val fromLoc = intent.getStringExtra("FROM_LOC") ?: "Start"
-        val toLoc = intent.getStringExtra("TO_LOC") ?: "End"
-        val date = intent.getStringExtra("DATE") ?: "Date"
-        val seats = intent.getStringArrayListExtra("SELECTED_SEATS") ?: arrayListOf()
-        val total = intent.getDoubleExtra("TOTAL_PRICE", 0.0)
-
-        // 3. Hiển thị dữ liệu lên màn hình
-        tvHeaderFrom.text = fromLoc
-        tvHeaderTo.text = toLoc
-        tvHeaderDate.text = date
-        tvBusName.text = operator
-        tvBusType.text = busType
-        tvSeatNumbers.text = seats.joinToString(", ")
-        tvTotalFare.text = "LKR ${total.toInt()}"
-        tvTicketPrice.text = "LKR ${total.toInt()}" // Giá hiển thị trên card nhỏ (hoặc giá đơn vị nếu muốn)
-
-        val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
-        tvHeaderUser.text = "Hello $userEmail!"
-
-        // 4. Xử lý nút chọn điểm Đón (Giả lập Menu)
-        layoutBoarding.setOnClickListener { view ->
-            val popup = PopupMenu(this, view)
-            // Thêm dữ liệu giả lập (Sau này lấy từ API)
-            popup.menu.add("Main Stand - $fromLoc")
-            popup.menu.add("Town Hall Stop")
-            popup.menu.add("Post Office Junction")
-
-            popup.setOnMenuItemClickListener { item ->
-                selectedBoarding = item.title.toString()
-                tvSelectedBoarding.text = selectedBoarding
-                tvSelectedBoarding.setTextColor(resources.getColor(R.color.black, null)) // Đổi màu chữ cho đậm
-                true
+        findViewById<android.view.View>(R.id.layoutBoarding).setOnClickListener {
+            showStopDialog("Select Boarding") { stop ->
+                selectedBoardingId = stop.id
+                tvSelectedBoarding.text = stop.locationName
             }
-            popup.show()
+        }
+        
+        findViewById<android.view.View>(R.id.layoutDrop).setOnClickListener {
+            showStopDialog("Select Drop-off") { stop ->
+                selectedDropId = stop.id
+                tvSelectedDrop.text = stop.locationName
+            }
         }
 
-        // 5. Xử lý nút chọn điểm Trả
-        layoutDrop.setOnClickListener { view ->
-            val popup = PopupMenu(this, view)
-            popup.menu.add("Main Stand - $toLoc")
-            popup.menu.add("City Center")
-            popup.menu.add("New Bazaar Stop")
-
-            popup.setOnMenuItemClickListener { item ->
-                selectedDrop = item.title.toString()
-                tvSelectedDrop.text = selectedDrop
-                tvSelectedDrop.setTextColor(resources.getColor(R.color.black, null))
-                true
-            }
-            popup.show()
-        }
-
-        // 6. Nút Proceed (Tiếp tục sang thanh toán)
-        btnNext.setOnClickListener {
-            if (selectedBoarding.isEmpty() || selectedDrop.isEmpty()) {
-                Toast.makeText(this, "Please select Boarding and Drop points", Toast.LENGTH_SHORT).show()
+        findViewById<android.view.View>(R.id.btnNext).setOnClickListener {
+            if(selectedBoardingId == -1 || selectedDropId == -1) {
+                Toast.makeText(this, "Please select both points", Toast.LENGTH_SHORT).show()
             } else {
-                // --- SỬA THÀNH GuestDetailsActivity ---
-                val nextIntent = Intent(this, GuestDetailsActivity::class.java)
-                nextIntent.putExtras(intent) // Chuyển tiếp toàn bộ dữ liệu cũ
-
-                // Gửi thêm điểm đón trả mới chọn
-                nextIntent.putExtra("BOARDING_POINT", selectedBoarding)
-                nextIntent.putExtra("DROP_POINT", selectedDrop)
-
-                startActivity(nextIntent)
+                val next = Intent(this, GuestDetailsActivity::class.java)
+                next.putExtras(intent)
+                next.putExtra("PICKUP_STOP_ID", selectedBoardingId)
+                next.putExtra("DROPOFF_STOP_ID", selectedDropId)
+                startActivity(next)
             }
         }
+        
+        findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
+    }
 
-        btnBack.setOnClickListener { finish() }
+    private fun loadStopsForTrip(tripId: Long) = lifecycleScope.launch {
+        try {
+            val trip = withContext(Dispatchers.IO) { tripsService.getTripById(tripId) }
+            if (trip != null) {
+                availableStops = withContext(Dispatchers.IO) { routesStopService.getStopsByRouteId(trip.routeId) }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this@BoardingDropActivity, "Error loading stops", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showStopDialog(title: String, onSelect: (RouteStop) -> Unit) {
+        if (availableStops.isEmpty()) {
+            Toast.makeText(this, "Loading stops...", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val names = availableStops.map { it.locationName }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setItems(names) { _, which ->
+                onSelect(availableStops[which])
+            }
+            .show()
     }
 }
-

@@ -198,6 +198,7 @@
                             <TextView android:text=" Available" android:layout_marginStart="8dp" android:textSize="12sp" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         </LinearLayout>
                         <TextView
+                            android:id="@+id/btnLowerDeck"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="LOWER"
@@ -207,6 +208,7 @@
                             android:textSize="12sp"
                             android:background="@drawable/bg_outline_red"/>
                         <TextView
+                            android:id="@+id/btnUpperDeck"
                             android:layout_marginTop="12dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

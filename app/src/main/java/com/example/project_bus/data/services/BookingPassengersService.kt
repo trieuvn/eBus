@@ -22,6 +22,12 @@ class BookingPassengersService {
             .decodeList<BookingPassenger>()
             .firstOrNull()
 
+    // --- NEW: Lấy list hành khách theo danh sách ID booking (dùng cho SeatSelection) ---
+    suspend fun getPassengersByBookingIds(bookingIds: List<Long>): List<BookingPassenger> =
+        client.from(Tables.BOOKING_PASSENGERS)
+            .select { filter { isIn("booking_id", bookingIds) } }
+            .decodeList()
+
     suspend fun createPassenger(passenger: BookingPassengerCreate): BookingPassenger =
         client.from(Tables.BOOKING_PASSENGERS)
             .insert(passenger) { select() }
@@ -40,11 +46,11 @@ class BookingPassengersService {
 
     suspend fun deleteById(id: Long): BookingPassenger =
         client.from(Tables.BOOKING_PASSENGERS)
-            .delete {
-                select()
-                filter { eq("id", id) }
-            }
+            .delete { select(); filter { eq("id", id) } }
             .decodeSingle<BookingPassenger>()
+
+    suspend fun getPassengersByBookingId(bookingId: Long): List<BookingPassenger> =
+        client.from(Tables.BOOKING_PASSENGERS)
+            .select { filter { eq("booking_id", bookingId) } }
+            .decodeList<BookingPassenger>()
 }
-
-

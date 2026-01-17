@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_pink">
+    android:background="#FFF5F6">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="24dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -31,11 +31,9 @@
                     android:layout_height="50dp"
                     app:cardCornerRadius="25dp"
                     app:cardElevation="0dp">
-
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:contentDescription="@string/desc_user_avatar"
                         android:scaleType="centerCrop"
                         android:src="@drawable/user_avatar" />
                 </androidx.cardview.widget.CardView>
@@ -46,181 +44,183 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
-
                     <TextView
-                        android:id="@+id/tvUserName"
+                        android:id="@+id/tvHomeUserName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Hello User!"
                         android:textColor="#333"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subtitle_where_go"
+                        android:text="Where do you want to go?"
                         android:textColor="#E57373"
-                        android:textSize="12sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
 
-                <FrameLayout
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_input_field">
-
+                <androidx.cardview.widget.CardView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center"
-                        android:contentDescription="@string/desc_notification"
                         android:src="@drawable/ic_notification"
-                        app:tint="#333" />
-                </FrameLayout>
+                        app:tint="#333333" />
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:background="@drawable/bg_red_rounded_box"
+                android:background="@drawable/bg_home_card"
                 android:padding="20dp">
 
                 <com.example.project_bus.ui.widgets.InstantAutoCompleteTextView
-                    android:id="@+id/etFrom"
+                    android:id="@+id/actvHomeOrigin"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginBottom="12dp"
-                    android:autofillHints="postalAddress"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="@string/hint_boarding"
-                    android:completionThreshold="1"
-                    android:inputType="textCapSentences"
+                    android:background="@drawable/bg_input_white"
+                    android:hint="Boarding From"
                     android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnSwap"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignBottom="@+id/etFrom"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="30dp"
-                    android:layout_marginBottom="-20dp"
-                    android:background="@drawable/ic_swap"
-                    android:backgroundTint="#222"
-                    android:contentDescription="@string/desc_swap"
-                    android:elevation="10dp"
-                    android:src="@drawable/ic_swap"
-                    app:tint="#FFF" />
+                    android:paddingEnd="60dp"
+                    android:textSize="14sp"
+                    android:inputType="textCapSentences"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <com.example.project_bus.ui.widgets.InstantAutoCompleteTextView
-                    android:id="@+id/etTo"
+                    android:id="@+id/actvHomeDestination"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_below="@+id/etFrom"
-                    android:layout_marginBottom="16dp"
-                    android:autofillHints="postalAddress"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="@string/hint_destination"
-                    android:completionThreshold="1"
-                    android:inputType="textCapSentences"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_input_white"
+                    android:hint="Where are you going?"
                     android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:textSize="14sp" />
+                    android:paddingEnd="60dp"
+                    android:textSize="14sp"
+                    android:inputType="textCapSentences"
+                    app:layout_constraintTop_toBottomOf="@id/actvHomeOrigin"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/btnHomeSwapLocations"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_swap_circle"
+                    android:src="@drawable/ic_swap_vertical"
+                    android:padding="10dp"
+                    android:elevation="10dp"
+                    android:outlineProvider="none"
+                    app:tint="#FFFFFF"
+                    app:layout_constraintTop_toBottomOf="@id/actvHomeOrigin"
+                    app:layout_constraintBottom_toTopOf="@id/actvHomeDestination"
+                    app:layout_constraintEnd_toEndOf="@id/actvHomeOrigin"
+                    android:layout_marginEnd="20dp" />
 
                 <LinearLayout
-                    android:id="@+id/rowDate"
+                    android:id="@+id/rowDateSelection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/etTo"
-                    android:layout_marginBottom="16dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/actvHomeDestination">
 
                     <TextView
-                        android:id="@+id/btnToday"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_date_button"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
+                        android:id="@+id/btnHomeDateToday"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_date_btn_selected"
+                        android:gravity="center"
                         android:text="Today"
-                        android:textColor="#FFF" />
+                        android:textColor="#FFF"
+                        android:textSize="13sp"
+                        android:layout_marginEnd="8dp"/>
 
                     <TextView
-                        android:id="@+id/btnTomorrow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_date_button"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
+                        android:id="@+id/btnHomeDateTomorrow"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_date_btn_unselected"
+                        android:gravity="center"
                         android:text="Tomorrow"
-                        android:textColor="#FFF" />
+                        android:textColor="#FFF"
+                        android:textSize="13sp"
+                        android:layout_marginEnd="8dp"/>
 
                     <LinearLayout
-                        android:id="@+id/btnOtherDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_date_button"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="8dp">
-
+                        android:id="@+id/btnHomeDateOther"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_date_btn_unselected"
+                        android:gravity="center"
+                        android:orientation="horizontal">
                         <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
                             android:src="@drawable/ic_calendar"
-                            app:tint="#FFF"
-                            tools:ignore="ContentDescription" />
-
+                            app:tint="#FFF"/>
                         <TextView
-                            android:id="@+id/tvOtherDateText"
+                            android:id="@+id/tvHomeDateOtherText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
                             android:text="Other"
-                            android:textColor="#FFF" />
+                            android:layout_marginStart="4dp"
+                            android:textColor="#FFF"
+                            android:textSize="13sp"/>
                     </LinearLayout>
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnSearch"
+                    android:id="@+id/btnHomeFindBus"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_below="@+id/rowDate"
-                    android:background="@drawable/bg_input_field"
-                    android:text="@string/btn_find_buses"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_btn_find_bus"
+                    android:text="Find Buses"
                     android:textAllCaps="false"
-                    android:textColor="@color/brand_red"
-                    android:textStyle="bold" />
-            </RelativeLayout>
+                    android:textColor="#D50000"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toBottomOf="@id/rowDateSelection"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/title_upcoming"
+                android:text="Your Bookings"
                 android:textColor="#0D1B2A"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBookings"
+                android:id="@+id/rvHomeBookingHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="80dp"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_booking"/>
+
             <TextView
-                android:id="@+id/tvNoUpcoming"
+                android:id="@+id/tvHomeNoHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="No upcoming journeys booked."
                 android:gravity="center"
                 android:visibility="gone"
-                android:textColor="#777"/>
+                android:textColor="#777"
+                android:padding="20dp"/>
 
         </LinearLayout>
     </ScrollView>
@@ -237,45 +237,37 @@
         <FrameLayout
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field">
-
+            android:background="@drawable/bg_input_white">
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:layout_gravity="center"
-                android:contentDescription="@string/desc_home"
                 android:src="@drawable/ic_home"
                 app:tint="#D50000" />
         </FrameLayout>
 
         <ImageView
             android:id="@+id/navTicket"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_marginHorizontal="30dp"
-            android:contentDescription="@string/desc_ticket"
             android:src="@drawable/ic_ticket"
-            app:tint="@color/nav_icon_unselected" />
+            app:tint="#FF8A80" />
 
         <ImageView
             android:id="@+id/navWallet"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_marginHorizontal="30dp"
-            android:contentDescription="@string/desc_wallet"
             android:src="@drawable/ic_wallet"
-            app:tint="@color/nav_icon_unselected" />
+            app:tint="#FF8A80" />
 
         <ImageView
             android:id="@+id/navSettings"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_marginHorizontal="20dp"
-            android:contentDescription="@string/desc_settings"
             android:src="@drawable/ic_settings"
-            app:tint="@color/nav_icon_unselected" />
-
+            app:tint="#FF8A80" />
     </LinearLayout>
-
 </RelativeLayout>
-
