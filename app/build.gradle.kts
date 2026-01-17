@@ -31,8 +31,6 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
-        // Google OAuth Web Client ID (from Google Cloud Console - eBus-web)
-        // Note: This must match the Web Application Client ID in Google Cloud Console
         val googleWebClientId = localProps.getProperty("GOOGLE_WEB_CLIENT_ID")
             ?: "883817940844-fi3oele3ck92ii8h0vj8lpnefokotaiu.apps.googleusercontent.com"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")

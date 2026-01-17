@@ -37,11 +37,9 @@ class BoardingDropActivity : AppCompatActivity() {
         val toLoc = intent.getStringExtra("TO_LOC") ?: ""
         val totalPrice = intent.getDoubleExtra("TOTAL_PRICE", 0.0)
         
-        // Setup UI Header
         findViewById<TextView>(R.id.tvHeaderFrom).text = fromLoc
         findViewById<TextView>(R.id.tvHeaderTo).text = toLoc
         
-        // CHANGED: Formatting
         val totalStr = if (totalPrice % 1.0 == 0.0) "%.0f".format(Locale.US, totalPrice) else "%.2f".format(Locale.US, totalPrice)
         findViewById<TextView>(R.id.tvTotalFare).text = "LKR $totalStr"
         

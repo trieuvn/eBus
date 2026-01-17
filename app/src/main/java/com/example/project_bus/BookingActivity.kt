@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.project_bus.data.SupabaseProvider
 import com.example.project_bus.data.services.RoutesService
 import com.example.project_bus.data.services.TripsService
-import com.example.project_bus.data.models.Trip // QUAN TRỌNG: models có s
 import com.example.project_bus.ui.adapters.TripsAdapter
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +34,6 @@ class BookingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_booking)
 
-        // Bind Views
         tvSummaryFrom = findViewById(R.id.tvCardFrom)
         tvSummaryTo = findViewById(R.id.tvCardTo)
         tvSummaryDate = findViewById(R.id.tvCardDate)
@@ -47,12 +45,10 @@ class BookingActivity : AppCompatActivity() {
 
         rvTrips.layoutManager = LinearLayoutManager(this)
 
-        // Get Intent Data
         val fromLoc = intent.getStringExtra("FROM_LOC") ?: "Kelaniya"
         val toLoc = intent.getStringExtra("TO_LOC") ?: "Colombo"
         val date = intent.getStringExtra("SELECTED_DATE") ?: "Today"
 
-        // Display Data
         tvSummaryFrom.text = fromLoc
         tvSummaryTo.text = toLoc
         tvSummaryDate.text = "$date | Bus Day"
@@ -60,7 +56,6 @@ class BookingActivity : AppCompatActivity() {
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         tvHeaderName.text = "Hello $userEmail!"
 
-        // Search
         searchTrips(fromLoc, toLoc, date)
     }
 
@@ -71,7 +66,7 @@ class BookingActivity : AppCompatActivity() {
             val allRoutes = withContext(Dispatchers.IO) { routesService.getAllRoutes() }
 
             val matchedRoute = allRoutes.find { route ->
-                val name = route.name.orEmpty().lowercase()
+                val name = route.name.lowercase()
                 name.contains(from.lowercase()) && name.contains(to.lowercase())
             }
 
@@ -80,7 +75,6 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // Dữ liệu này trả về List<models.Trip>
             val allTrips = withContext(Dispatchers.IO) { tripsService.getAllTrips() }
 
             val filteredTrips = allTrips.filter { it.routeId == matchedRoute.id && it.status == 1 }
@@ -91,7 +85,6 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // Adapter bây giờ nhận List<models.Trip>, khớp hoàn toàn
             rvTrips.adapter = TripsAdapter(filteredTrips) { trip -> 
                 val intent = Intent(this@BookingActivity, SeatSelectionActivity::class.java)
                 intent.putExtra("TRIP_ID", trip.id)
