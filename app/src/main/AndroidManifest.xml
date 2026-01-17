@@ -26,6 +26,10 @@
         <activity
             android:name=".ui.auth.SignupSuccessActivity"
             android:exported="false" />
+            
+        <activity
+            android:name=".ui.auth.VerifyOtpActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ui.auth.AuthCallbackActivity"
@@ -65,6 +69,8 @@
         <activity android:name=".GuestDetailsActivity" />
         <activity android:name=".PaymentActivity" />
         <activity android:name=".PaymentSuccessActivity" />
+        
+        <activity android:name=".TicketDetailActivity" />
 
     </application>
 

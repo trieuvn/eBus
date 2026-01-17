@@ -10,7 +10,7 @@ data class Trip(
     @SerialName("operator_name") val operatorName: String? = null,
     @SerialName("departure_time") val departureTime: String? = null,
     @SerialName("arrival_time") val arrivalTime: String? = null,
-    @SerialName("price") val price: Double = 0.0, // Fixed: base_price -> price
+    @SerialName("price") val price: Double = 0.0, 
     @SerialName("bus_type") val busType: String? = "Standard",
     @SerialName("total_seats") val totalSeats: Int = 40,
     val status: Int = 1
@@ -22,7 +22,7 @@ data class TripCreate(
     @SerialName("operator_name") val operatorName: String? = null,
     @SerialName("departure_time") val departureTime: String? = null,
     @SerialName("arrival_time") val arrivalTime: String? = null,
-    @SerialName("price") val price: Double? = null, // Fixed
+    @SerialName("price") val price: Double? = null,
     @SerialName("bus_type") val busType: String? = "Standard",
     @SerialName("total_seats") val totalSeats: Int = 40,
     val status: Int = 1
@@ -34,7 +34,7 @@ data class TripUpdate(
     @SerialName("operator_name") val operatorName: String? = null,
     @SerialName("departure_time") val departureTime: String? = null,
     @SerialName("arrival_time") val arrivalTime: String? = null,
-    @SerialName("price") val price: Double? = null, // Fixed
+    @SerialName("price") val price: Double? = null,
     @SerialName("bus_type") val busType: String? = null,
     val status: Int? = null
 )

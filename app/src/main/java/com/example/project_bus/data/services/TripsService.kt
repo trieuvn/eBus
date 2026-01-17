@@ -35,7 +35,7 @@ class TripsService {
                 update.arrivalTime?.let { set("arrival_time", it) }
                 update.operatorName?.let { set("operator_name", it) }
                 update.busType?.let { set("bus_type", it) }
-                update.price?.let { set("price", it) } // Fixed: base_price -> price
+                update.price?.let { set("price", it) }
                 update.status?.let { set("status", it) }
             }) {
                 select()

@@ -34,6 +34,7 @@ class BookingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_booking)
 
+        // Bind Views
         tvSummaryFrom = findViewById(R.id.tvCardFrom)
         tvSummaryTo = findViewById(R.id.tvCardTo)
         tvSummaryDate = findViewById(R.id.tvCardDate)
@@ -45,10 +46,12 @@ class BookingActivity : AppCompatActivity() {
 
         rvTrips.layoutManager = LinearLayoutManager(this)
 
+        // Get Intent Data
         val fromLoc = intent.getStringExtra("FROM_LOC") ?: "Kelaniya"
         val toLoc = intent.getStringExtra("TO_LOC") ?: "Colombo"
         val date = intent.getStringExtra("SELECTED_DATE") ?: "Today"
 
+        // Display Data
         tvSummaryFrom.text = fromLoc
         tvSummaryTo.text = toLoc
         tvSummaryDate.text = "$date | Bus Day"
@@ -56,6 +59,7 @@ class BookingActivity : AppCompatActivity() {
         val userEmail = SupabaseProvider.client.auth.currentUserOrNull()?.email ?: "User"
         tvHeaderName.text = "Hello $userEmail!"
 
+        // Search
         searchTrips(fromLoc, toLoc, date)
     }
 
@@ -75,6 +79,7 @@ class BookingActivity : AppCompatActivity() {
                 return@launch
             }
 
+            // Dữ liệu này trả về List<models.Trip>
             val allTrips = withContext(Dispatchers.IO) { tripsService.getAllTrips() }
 
             val filteredTrips = allTrips.filter { it.routeId == matchedRoute.id && it.status == 1 }
