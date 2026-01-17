@@ -3,7 +3,9 @@ package com.example.project_bus.data.services
 import com.example.project_bus.data.SupabaseProvider
 import com.example.project_bus.data.Tables
 import com.example.project_bus.data.models.AppUser
+import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
 import kotlinx.serialization.json.buildJsonObject
@@ -13,6 +15,15 @@ import java.util.UUID
 class AuthService {
 
     private val client = SupabaseProvider.client
+
+    /**
+     * Đăng nhập/đăng ký bằng Google (OAuth).
+     *
+     * Lưu ý: cần cấu hình Deeplink + Redirect URLs đúng để callback quay lại app.
+     */
+    suspend fun signInWithGoogle() {
+        client.auth.signInWith(Google)
+    }
 
     data class SignUpResult(
         val authId: String,
@@ -47,7 +58,7 @@ class AuthService {
 
         val authId = signedUpUser?.id
             ?: client.auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("Không lấy được authId từ Supabase sau khi đăng ký.")
+            ?: throw IllegalStateException("Unable to get authId from Supabase after sign-up.")
 
         val isLoggedInNow = client.auth.currentUserOrNull() != null
         return SignUpResult(authId = authId, needsEmailConfirmation = !isLoggedInNow)
@@ -66,7 +77,7 @@ class AuthService {
         }
 
         val authId = client.auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("Đăng nhập thành công nhưng không có session/user.")
+            ?: throw IllegalStateException("Signed in successfully, but no session/user was returned.")
 
         return getProfileByAuthId(authId)
     }

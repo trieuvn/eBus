@@ -7,7 +7,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 /**
- * Ping Supabase bằng cách SELECT bảng "instruments".
+ * Ping Supabase by selecting from the "instruments" table.
  */
 object SupabaseConnectionChecker {
 
@@ -21,24 +21,26 @@ object SupabaseConnectionChecker {
 
     fun humanMessage(t: Throwable): String = when (t) {
         is UnknownHostException ->
-            "Không resolve được host. Kiểm tra SUPABASE_URL hoặc mạng."
+            "Unable to resolve host. Check your SUPABASE_URL or network connection."
 
         is SocketTimeoutException ->
-            "Timeout. Kiểm tra mạng hoặc Supabase URL."
+            "Request timed out. Check your network connection or Supabase URL."
 
         is ClientRequestException -> {
             val code = t.response.status.value
             when (code) {
-                401 -> "401 Unauthorized: anon key sai / thiếu header."
-                403 -> "403 Forbidden: bị RLS policy chặn."
-                404 -> "404 Not Found: sai tên bảng/endpoint (vd: instruments)."
+                401 -> "401 Unauthorized: invalid anon key or missing auth headers."
+                403 -> "403 Forbidden: blocked by RLS policy."
+                404 -> "404 Not Found: wrong table/endpoint name (e.g., instruments)."
                 else -> "HTTP $code: ${t.response.status.description}"
             }
         }
 
         is ServerResponseException ->
-            "Server lỗi ${t.response.status.value}: ${t.response.status.description}"
+            "Server error ${t.response.status.value}: ${t.response.status.description}"
 
         else -> t.message ?: t::class.simpleName.orEmpty()
     }
 }
+
+

@@ -3,3 +3,4 @@
     <solid android:color="@color/brand_red"/>
     <corners android:topLeftRadius="30dp" android:topRightRadius="30dp"/>
 </shape>
+

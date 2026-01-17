@@ -38,3 +38,5 @@ data class BookingPassengerUpdate(
     @SerialName("full_name")
     val fullName: String? = null
 )
+
+

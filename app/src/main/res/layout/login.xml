@@ -161,6 +161,8 @@
             android:layout_height="55dp"
             android:layout_marginBottom="40dp"
             android:background="@drawable/bg_button_gray"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -190,3 +192,4 @@
 
     </LinearLayout>
 </ScrollView>
+

@@ -32,3 +32,5 @@ data class RouteUpdate(
     @SerialName("est_duration")
     val estDuration: Int? = null
 )
+
+

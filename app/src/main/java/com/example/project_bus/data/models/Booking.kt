@@ -92,3 +92,5 @@ data class BookingUpdate(
     @SerialName("booking_status")
     val bookingStatus: Int? = null
 )
+
+

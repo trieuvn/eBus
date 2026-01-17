@@ -7,6 +7,7 @@ import android.util.Patterns
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -54,12 +55,12 @@ class RegisterActivity : AppCompatActivity() {
 
             // Validate nhanh để tránh gọi API vô ích
             when {
-                fullName.isBlank() -> toast("Vui lòng nhập tên")
-                email.isBlank() -> toast("Vui lòng nhập email")
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Email không hợp lệ")
+                fullName.isBlank() -> toast("Please enter your full name")
+                email.isBlank() -> toast("Please enter your email")
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Invalid email address")
                 email.endsWith("@test.com", true) || email.endsWith("@example.com", true) ->
-                    toast("Supabase Auth không hỗ trợ domain @test.com/@example.com. Dùng email thật (gmail...)")
-                password.trim().length < 6 -> toast("Mật khẩu tối thiểu 6 ký tự")
+                    toast("Please use a real email address (e.g., Gmail).")
+                password.trim().length < 6 -> toast("Password must be at least 6 characters")
                 else -> {
                     btnSignUp.isEnabled = false
 
@@ -76,15 +77,15 @@ class RegisterActivity : AppCompatActivity() {
                             }
 
                             if (result.needsEmailConfirmation) {
-                                toast("Đăng ký OK. Mở email để xác thực rồi quay lại đăng nhập.")
+                                toast("Sign-up successful. Please check your email and click the verification link, then come back to sign in.")
                             } else {
-                                toast("Đăng ký OK ✅")
+                                toast("Sign-up successful ✅")
                             }
 
-                            startActivity(Intent(this@RegisterActivity, SignupSuccessActivity::class.java))
+                            startActivity(Intent(this@RegisterActivity, SignupSuccessActivity::class.java).putExtra("email", email))
                             finish()
                         } catch (e: Exception) {
-                            toast("Đăng ký thất bại: ${friendlyAuthMessage(e)}")
+                            toast("Sign-up failed: ${friendlyAuthMessage(e)}")
                         } finally {
                             btnSignUp.isEnabled = true
                         }
@@ -101,6 +102,22 @@ class RegisterActivity : AppCompatActivity() {
         txtGoLogin.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
+        }
+
+        // Google OAuth sign-up / sign-in
+        btnGoogleSignUp.setOnClickListener {
+            btnGoogleSignUp.isEnabled = false
+            lifecycleScope.launch {
+                try {
+                    authService.signInWithGoogle()
+                    toast("Continue with Google in your browser...")
+                    // AuthCallbackActivity sẽ tự đưa về Home sau khi callback.
+                } catch (e: Exception) {
+                    toast("Error: ${friendlyAuthMessage(e)}")
+                } finally {
+                    btnGoogleSignUp.isEnabled = true
+                }
+            }
         }
     }
 
@@ -182,17 +199,16 @@ class RegisterActivity : AppCompatActivity() {
         val msg = (e.message ?: e.toString())
         return when {
             msg.contains("email_address_invalid", ignoreCase = true) ->
-                "email_address_invalid (đừng dùng @test.com/@example.com)"
+                "Invalid email address (avoid @test.com/@example.com)."
             msg.contains("email_address_not_authorized", ignoreCase = true) ->
-                "Email bị chặn do project đang dùng SMTP mặc định của Supabase (chỉ gửi cho member). " +
-                "Dev nhanh: tắt Confirm email. Chuẩn: cấu hình SMTP riêng."
+                "Email delivery is blocked because the project is using Supabase's default SMTP (it only sends to project members). For development you can temporarily disable \"Confirm email\", or configure a custom SMTP for production."
             msg.contains("email_not_confirmed", ignoreCase = true) ->
-                "Email chưa xác thực. Mở email để xác thực rồi đăng nhập."
+                "Email not verified. Please check your inbox and click the verification link, then sign in."
             msg.contains("user_already_exists", ignoreCase = true) ||
                     msg.contains("already registered", ignoreCase = true) ->
-                "Email đã tồn tại. Hãy đăng nhập."
+                "This email is already registered. Please sign in."
             msg.contains("weak_password", ignoreCase = true) ->
-                "Mật khẩu yếu. Hãy dùng mật khẩu mạnh hơn."
+                "Weak password. Please use a stronger password."
             else -> msg
         }
     }
