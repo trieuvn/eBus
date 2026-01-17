@@ -47,20 +47,62 @@ class RegisterActivity : AppCompatActivity() {
         val txtGoLogin = findViewById<TextView>(R.id.txtGoLogin)
         val btnGoogleSignUp = findViewById<View>(R.id.btnGoogleSignUp)
 
+        val cbTerms = findViewById<android.widget.CheckBox>(R.id.cbTerms)
+
         btnSignUp.setOnClickListener {
             val fullName = edtFullName.text.toString().trim()
             val email = edtEmail.text.toString().trim()
             val phone = edtPhone.text.toString().trim()
             val password = edtPassword.text.toString()
+            val isTermsChecked = cbTerms.isChecked
 
-            // Validate nhanh để tránh gọi API vô ích
+            // XSS / Sanitize Logic (Simple check)
+            if (fullName.contains("<script>", true) || fullName.contains("javascript:", true)) {
+                // System should sanitize or block. We block.
+                toast("Invalid input detected.")
+                return@setOnClickListener
+            }
+            
+            // Validation Logic
             when {
-                fullName.isBlank() -> toast("Please enter your full name")
-                email.isBlank() -> toast("Please enter your email")
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Invalid email address")
-                email.endsWith("@test.com", true) || email.endsWith("@example.com", true) ->
-                    toast("Please use a real email address (e.g., Gmail).")
-                password.trim().length < 6 -> toast("Password must be at least 6 characters")
+                // 1. All fields empty (Name, Email, Password required)
+                fullName.isBlank() && email.isBlank() && password.isBlank() -> toast("All fields are required.")
+
+                // 2. Name Empty
+                fullName.isBlank() -> toast("Name field cannot be empty.")
+                
+                // 3. Name Alphabetic Check
+                !fullName.matches(Regex("^[a-zA-Z\\s]+$")) -> toast("Name should only contain alphabetic characters.")
+                
+                // 4. Name Length Limit
+                fullName.length > 500 -> toast("Name exceeds character limit.")
+
+                // 5. Email Empty
+                email.isBlank() -> toast("Email address is required.")
+
+                // 6. Invalid Email
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Please enter a valid email address.")
+
+                // 7. Password Empty
+                password.isBlank() -> toast("Password field is required.")
+
+                // 8. Password Short (< 8 chars)
+                password.length < 8 -> toast("Password must be at least 8 characters.")
+
+                // 9. Password Complexity (Mix of letters, numbers, symbols)
+                // Regex: min 1 letter, 1 number, 1 special char is usually implied by "mix", 
+                // but user said "mix of letters, numbers, and symbols".
+                // Let's interpret strictly: needs Letter AND Number AND (Symbol OR just mix?).
+                // Common strict regex: ^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$
+                // But specifically for "password123", it has letters and numbers but maybe no symbols?
+                // Request: "Password not strong enough. Use a mix of letters, numbers, and symbols."
+                // So "password123" fails -> means we NEED symbols.
+                !password.matches(Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.,:;^\\-_+=\\[\\]{}()|/<>~]).+$")) -> 
+                    toast("Password not strong enough. Use a mix of letters, numbers, and symbols.")
+
+                // 10. Terms of Service
+                !isTermsChecked -> toast("You must agree to the terms of service to continue.")
+
                 else -> {
                     btnSignUp.isEnabled = false
 
@@ -72,20 +114,24 @@ class RegisterActivity : AppCompatActivity() {
                                     password = password,
                                     fullName = fullName,
                                     phoneNumber = phone,
-                                    role = 0 // passenger mặc định
+                                    role = 0 // passenger default
                                 )
                             }
 
                             if (result.needsEmailConfirmation) {
-                                toast("Sign-up successful. Please check your email and click the verification link, then come back to sign in.")
+                              // Success case -> Redirect to Verify Email (or Dashboard logic but here we show Verify screen)
+                              // User request says "Redirect to 'Verify Email' or Dashboard."
+                              // Current logic goes into SignupSuccessActivity which acts as Verify Email prompt.
+                                toast("Sign-up successful. Please check your email.")
                             } else {
-                                toast("Sign-up successful ✅")
+                                // toast("Sign-up successful ✅") -- Removed
                             }
 
                             startActivity(Intent(this@RegisterActivity, SignupSuccessActivity::class.java).putExtra("email", email))
                             finish()
                         } catch (e: Exception) {
-                            toast("Sign-up failed: ${friendlyAuthMessage(e)}")
+                            val msg = friendlyAuthMessage(e)
+                            toast(msg)
                         } finally {
                             btnSignUp.isEnabled = true
                         }
@@ -104,21 +150,7 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
 
-        // Google OAuth sign-up / sign-in
-        btnGoogleSignUp.setOnClickListener {
-            btnGoogleSignUp.isEnabled = false
-            lifecycleScope.launch {
-                try {
-                    authService.signInWithGoogle()
-                    toast("Continue with Google in your browser...")
-                    // AuthCallbackActivity sẽ tự đưa về Home sau khi callback.
-                } catch (e: Exception) {
-                    toast("Error: ${friendlyAuthMessage(e)}")
-                } finally {
-                    btnGoogleSignUp.isEnabled = true
-                }
-            }
-        }
+
     }
 
     /**
@@ -165,7 +197,7 @@ class RegisterActivity : AppCompatActivity() {
                     authService.handleOAuthSuccess()
                 }
 
-                toast("Đăng ký Google thành công!")
+                // toast("Đăng ký Google thành công!") -- Removed
                 navigateToHome()
 
             } catch (e: GetCredentialCancellationException) {
@@ -199,16 +231,14 @@ class RegisterActivity : AppCompatActivity() {
         val msg = (e.message ?: e.toString())
         return when {
             msg.contains("email_address_invalid", ignoreCase = true) ->
-                "Invalid email address (avoid @test.com/@example.com)."
-            msg.contains("email_address_not_authorized", ignoreCase = true) ->
-                "Email delivery is blocked because the project is using Supabase's default SMTP (it only sends to project members). For development you can temporarily disable \"Confirm email\", or configure a custom SMTP for production."
+                "Invalid email address."
             msg.contains("email_not_confirmed", ignoreCase = true) ->
                 "Email not verified. Please check your inbox and click the verification link, then sign in."
             msg.contains("user_already_exists", ignoreCase = true) ||
                     msg.contains("already registered", ignoreCase = true) ->
-                "This email is already registered. Please sign in."
+                "This email is already in use."
             msg.contains("weak_password", ignoreCase = true) ->
-                "Weak password. Please use a stronger password."
+                "Password not strong enough. Use a mix of letters, numbers, and symbols."
             else -> msg
         }
     }
