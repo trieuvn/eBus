@@ -86,21 +86,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Google OAuth sign-in
-        btnGoogleSignIn.setOnClickListener {
-            btnGoogleSignIn.isEnabled = false
-            lifecycleScope.launch {
-                try {
-                    authService.signInWithGoogle()
-                    toast("Continue with Google in your browser...")
-                    // Sau khi login xong, Supabase sẽ redirect về deeplink và AuthCallbackActivity sẽ tự đưa về Home.
-                } catch (e: Exception) {
-                    toast("Error: ${friendlyAuthMessage(e)}")
-                } finally {
-                    btnGoogleSignIn.isEnabled = true
-                }
-            }
-        }
+
     }
 
     /**

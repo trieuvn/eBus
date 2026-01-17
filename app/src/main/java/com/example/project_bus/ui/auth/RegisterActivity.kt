@@ -104,21 +104,7 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
 
-        // Google OAuth sign-up / sign-in
-        btnGoogleSignUp.setOnClickListener {
-            btnGoogleSignUp.isEnabled = false
-            lifecycleScope.launch {
-                try {
-                    authService.signInWithGoogle()
-                    toast("Continue with Google in your browser...")
-                    // AuthCallbackActivity sẽ tự đưa về Home sau khi callback.
-                } catch (e: Exception) {
-                    toast("Error: ${friendlyAuthMessage(e)}")
-                } finally {
-                    btnGoogleSignUp.isEnabled = true
-                }
-            }
-        }
+
     }
 
     /**
