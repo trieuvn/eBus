@@ -30,6 +30,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
+
+        // Google OAuth Web Client ID (from Google Cloud Console - eBus-web)
+        // Note: This must match the Web Application Client ID in Google Cloud Console
+        val googleWebClientId = localProps.getProperty("GOOGLE_WEB_CLIENT_ID")
+            ?: "883817940844-fi3oele3ck92ii8h0vj8lpnefokotaiu.apps.googleusercontent.com"
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
     }
 
     buildFeatures {
@@ -67,7 +73,15 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.auth)
+    implementation(libs.supabase.compose.auth)
     implementation(libs.ktor.client.android)
+
+    // Credential Manager for Google Sign-In
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    // Java desugaring libs
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
