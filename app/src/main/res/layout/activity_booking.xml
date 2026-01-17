@@ -179,6 +179,14 @@
         android:gravity="center"
         android:orientation="horizontal">
 
+        <ImageView
+            android:id="@+id/navTicket"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginHorizontal="30dp"
+            android:src="@drawable/ic_home"
+            app:tint="#FF8A80" />
+
         <FrameLayout
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -188,17 +196,9 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_home"
+                android:src="@drawable/ic_ticket"
                 app:tint="#D50000" />
         </FrameLayout>
-
-        <ImageView
-            android:id="@+id/navTicket"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginHorizontal="30dp"
-            android:src="@drawable/ic_ticket"
-            app:tint="#FF8A80" />
 
         <ImageView
             android:id="@+id/navWallet"
