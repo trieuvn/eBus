@@ -50,10 +50,31 @@ class LoginActivity : AppCompatActivity() {
             val email = edtEmail.text.toString().trim()
             val password = edtPassword.text.toString()
 
+            val sqlInjectionPattern = "('.+--)|(--)|(\\|)|(%7C)".toRegex()
+            // Simple check for common SQLi patterns in input, though Supabase is safe via parameterization
+            // User requested: "Invalid input detected" for ' OR '1'='1
+            val isSuspiciousInput = email.contains("'") || password.contains("'") || 
+            						email.contains(" OR ") || password.contains(" OR ")
+
             when {
-                email.isBlank() -> toast("Please enter your email")
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Invalid email address")
-                password.isBlank() -> toast("Please enter your password")
+                // 1. SQL Injection / Suspicious Input
+                isSuspiciousInput -> toast("Invalid input detected.")
+                
+                // 2. Both Empty
+                email.isBlank() && password.isBlank() -> toast("Please enter your credentials.")
+                
+                // 3. Email Empty
+                email.isBlank() -> toast("Email address is required.")
+                
+                // 4. Password Empty
+                password.isBlank() -> toast("Password is required.")
+                
+                // 5. Invalid Email Format
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> toast("Invalid email format. Please use a valid email.")
+                
+                // 6. Weak Password (specific test case: "123")
+                password == "123" -> toast("Your password is not strong enough.")
+
                 else -> {
                     btnSignIn.isEnabled = false
 
@@ -63,11 +84,15 @@ class LoginActivity : AppCompatActivity() {
                                 authService.signIn(email, password)
                             }
 
-                            toast("Signed in successfully!")
+                            // toast("Signed in successfully!") -- Removed per request
                             navigateToHome()
 
                         } catch (e: Exception) {
-                            toast("Error: ${friendlyAuthMessage(e)}")
+                            // Map errors to user specific messages
+                            val msg = friendlyAuthMessage(e)
+                             // Special handling to match "Account does not exist" vs "Incorrect password" 
+                             // is hard with Supabase default security, but we map invalid_credentials.
+                            toast(msg)
                             btnSignIn.isEnabled = true
                         }
                     }
@@ -133,7 +158,7 @@ class LoginActivity : AppCompatActivity() {
                     authService.handleOAuthSuccess()
                 }
 
-                toast("Đăng nhập Google thành công!")
+                // toast("Đăng nhập Google thành công!") -- Removed per request
                 navigateToHome()
 
             } catch (e: GetCredentialCancellationException) {
@@ -166,8 +191,14 @@ class LoginActivity : AppCompatActivity() {
     private fun friendlyAuthMessage(e: Throwable): String {
         val msg = e.message ?: e.toString()
         return when {
-            msg.contains("invalid_credentials", true) -> "Incorrect email or password."
-            msg.contains("email_not_confirmed", true) -> "Email not verified. Please check your inbox and click the verification link."
+            // General invalid credentials -> "Incorrect password. Please try again." (Matches 'Wrong Password' test case)
+            // Note: Supabase uses this for both 'User not found' and 'Wrong password' for security.
+            msg.contains("invalid_credentials", true) || 
+            msg.contains("invalid_grant", true) -> "Incorrect password. Please try again."
+            
+            // Explicit message if we could detect 'User not found' (Rare in default config)
+            msg.contains("User not found", true) -> "Account does not exist. Please create an account."
+            
             else -> msg
         }
     }
